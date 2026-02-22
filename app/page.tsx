@@ -7,8 +7,7 @@ import SmartScan from '@/components/SmartScan';
 import EcoLocator from '@/components/EcoLocator';
 import B2BPortal from '@/components/B2BPortal';
 import BottomNav from '@/components/BottomNav';
-
-export type ViewState = 'dashboard' | 'scan' | 'locator' | 'rewards' | 'b2b';
+import { ViewState } from '@/lib/types';
 
 export default function App() {
   const [currentView, setCurrentView] = useState<ViewState>('dashboard');

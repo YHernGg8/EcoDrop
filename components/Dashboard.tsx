@@ -1,4 +1,4 @@
-import { ViewState } from '@/app/page';
+import { ViewState } from '@/lib/types';
 import { Droplet, MapPin, Leaf, ChevronRight, ArrowRight } from 'lucide-react';
 
 interface DashboardProps {
