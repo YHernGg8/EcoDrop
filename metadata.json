@@ -1,0 +1,8 @@
+{
+  "name": "EcoDrop",
+  "description": "Digitalizing Waste for a Greener Tomorrow - AI Smart Scan for Used Cooking Oil",
+  "requestFramePermissions": [
+    "camera",
+    "geolocation"
+  ]
+}
