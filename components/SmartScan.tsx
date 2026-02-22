@@ -14,6 +14,8 @@ interface ScanResult {
   grade: 'A' | 'B' | 'C';
   debrisDetected: boolean;
   reasoning: string;
+  purityPercentage: number;
+  waterContent: 'Low' | 'Medium' | 'High';
 }
 
 export default function SmartScan({ onComplete, onBack }: SmartScanProps) {
@@ -55,11 +57,13 @@ export default function SmartScan({ onComplete, onBack }: SmartScanProps) {
           {
             parts: [
               { 
-                text: `You are an AI trained to analyze Used Cooking Oil (UCO) for recycling.
+                text: `You are an AI trained to analyze Used Cooking Oil (UCO) for recycling based on Malaysian standards.
                 Analyze this image and provide:
-                1. grade: "A" (Clear/Light yellow, highly reusable), "B" (Dark brown/Used, acceptable), or "C" (Black/Heavy debris, poor quality).
+                1. grade: "A" (Premium UCO: Light color, clear, minimal food particles/water), "B" (Standard UCO: Brownish, some food particles, typical household use), or "C" (Low-grade UCO: Dark brown/black, thick, high debris, high water content).
                 2. debrisDetected: true or false (if there are significant food particles).
-                3. reasoning: A short 1-sentence explanation of why you gave this grade.` 
+                3. reasoning: A short 1-sentence explanation of why you gave this grade.
+                4. purityPercentage: A number from 0 to 100 representing the estimated purity of the oil.
+                5. waterContent: "Low", "Medium", or "High" representing the estimated water content.` 
               },
               { 
                 inlineData: { 
@@ -77,9 +81,11 @@ export default function SmartScan({ onComplete, onBack }: SmartScanProps) {
             properties: {
               grade: { type: Type.STRING, description: "A, B, or C" },
               debrisDetected: { type: Type.BOOLEAN },
-              reasoning: { type: Type.STRING }
+              reasoning: { type: Type.STRING },
+              purityPercentage: { type: Type.NUMBER },
+              waterContent: { type: Type.STRING }
             },
-            required: ["grade", "debrisDetected", "reasoning"]
+            required: ["grade", "debrisDetected", "reasoning", "purityPercentage", "waterContent"]
           }
         }
       });
@@ -183,6 +189,23 @@ export default function SmartScan({ onComplete, onBack }: SmartScanProps) {
                     <div className="flex items-start gap-3 bg-gray-50 p-3 rounded-xl">
                       <CheckCircle2 size={20} className="text-green-500 mt-0.5 shrink-0" />
                       <p className="text-sm">{result.reasoning}</p>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="bg-gray-50 p-3 rounded-xl">
+                        <div className="text-xs text-gray-500 mb-1">Estimated Purity</div>
+                        <div className="font-bold text-lg text-gray-900">{result.purityPercentage}%</div>
+                      </div>
+                      <div className="bg-gray-50 p-3 rounded-xl">
+                        <div className="text-xs text-gray-500 mb-1">Water Content</div>
+                        <div className={`font-bold text-lg ${
+                          result.waterContent === 'Low' ? 'text-green-600' :
+                          result.waterContent === 'Medium' ? 'text-yellow-600' :
+                          'text-red-600'
+                        }`}>
+                          {result.waterContent}
+                        </div>
+                      </div>
                     </div>
                     
                     {result.debrisDetected && (

@@ -1,4 +1,4 @@
-import { ViewState } from '@/lib/types';
+import { ViewState } from '@/app/page';
 import { Home, ScanLine, Map, Gift, Building2 } from 'lucide-react';
 
 interface BottomNavProps {

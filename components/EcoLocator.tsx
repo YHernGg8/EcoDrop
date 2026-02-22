@@ -1,29 +1,17 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { ArrowLeft, Navigation, MapPin } from 'lucide-react';
+import { useState } from 'react';
+import { ArrowLeft, Navigation } from 'lucide-react';
 import dynamic from 'next/dynamic';
 
-// Dynamically import MapContainer to avoid SSR issues with Leaflet
-const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), { ssr: false });
-const TileLayer = dynamic(() => import('react-leaflet').then(mod => mod.TileLayer), { ssr: false });
-const Marker = dynamic(() => import('react-leaflet').then(mod => mod.Marker), { ssr: false });
-const Popup = dynamic(() => import('react-leaflet').then(mod => mod.Popup), { ssr: false });
-const ZoomControl = dynamic(() => import('react-leaflet').then(mod => mod.ZoomControl), { ssr: false });
-
-import 'leaflet/dist/leaflet.css';
+const MapComponent = dynamic(() => import('./MapComponent'), { ssr: false });
 
 interface EcoLocatorProps {
   onBack: () => void;
 }
 
 export default function EcoLocator({ onBack }: EcoLocatorProps) {
-  const [isMounted, setIsMounted] = useState(false);
   const [selectedBin, setSelectedBin] = useState<number | null>(null);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
 
   // Mock data for bins with coordinates
   const bins = [
@@ -33,27 +21,6 @@ export default function EcoLocator({ onBack }: EcoLocatorProps) {
   ];
 
   const userLocation = { lat: 40.7800, lng: -73.9700 };
-
-  // Custom icon setup for Leaflet using L.divIcon
-  const createIcon = (fillLevel: number) => {
-    if (typeof window === 'undefined') return null;
-    const L = require('leaflet');
-    const color = fillLevel >= 90 ? '#ef4444' : fillLevel >= 70 ? '#eab308' : '#16a34a';
-    
-    return L.divIcon({
-      className: 'custom-leaflet-icon',
-      html: `<div style="background-color: ${color}; width: 24px; height: 24px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>`,
-      iconSize: [24, 24],
-      iconAnchor: [12, 12]
-    });
-  };
-
-  const userIcon = typeof window !== 'undefined' ? require('leaflet').divIcon({
-    className: 'user-leaflet-icon',
-    html: `<div style="background-color: #3b82f6; width: 16px; height: 16px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3);"></div>`,
-    iconSize: [16, 16],
-    iconAnchor: [8, 8]
-  }) : null;
 
   return (
     <div className="flex flex-col h-full bg-gray-50 relative">
@@ -67,49 +34,12 @@ export default function EcoLocator({ onBack }: EcoLocatorProps) {
 
       {/* Map Area */}
       <div className="flex-1 relative bg-blue-50 z-0">
-        {isMounted && (
-          <MapContainer 
-            center={[userLocation.lat, userLocation.lng]} 
-            zoom={14} 
-            zoomControl={false}
-            style={{ height: '100%', width: '100%' }}
-          >
-            <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
-            />
-            <ZoomControl position="topright" />
-            
-            {/* User Location */}
-            {userIcon && (
-              <Marker position={[userLocation.lat, userLocation.lng]} icon={userIcon}>
-                <Popup>You are here</Popup>
-              </Marker>
-            )}
-
-            {/* Bins */}
-            {bins.map((bin) => {
-              const icon = createIcon(bin.fillLevel);
-              if (!icon) return null;
-              
-              return (
-                <Marker 
-                  key={bin.id} 
-                  position={[bin.lat, bin.lng]} 
-                  icon={icon}
-                  eventHandlers={{
-                    click: () => setSelectedBin(bin.id),
-                  }}
-                >
-                  <Popup>
-                    <div className="font-semibold">{bin.name}</div>
-                    <div className="text-sm text-gray-600">{bin.fillLevel}% Full</div>
-                  </Popup>
-                </Marker>
-              );
-            })}
-          </MapContainer>
-        )}
+        <MapComponent 
+          bins={bins} 
+          userLocation={userLocation} 
+          selectedBin={selectedBin} 
+          setSelectedBin={setSelectedBin} 
+        />
       </div>
 
       {/* Bottom Sheet (Nearby Bins) */}
