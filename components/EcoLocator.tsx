@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { ArrowLeft, Navigation } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { ArrowLeft, Navigation, LocateFixed } from 'lucide-react';
 import dynamic from 'next/dynamic';
 
 const MapComponent = dynamic(() => import('./MapComponent'), { ssr: false });
@@ -12,15 +12,59 @@ interface EcoLocatorProps {
 
 export default function EcoLocator({ onBack }: EcoLocatorProps) {
   const [selectedBin, setSelectedBin] = useState<number | null>(null);
+  const [userLocation, setUserLocation] = useState({ lat: 3.1390, lng: 101.6869 }); // Default to KL
+  const [locationAccuracy, setLocationAccuracy] = useState<number | null>(null);
+  const [isLocating, setIsLocating] = useState(false);
+  const [bins, setBins] = useState<any[]>([]);
 
-  // Mock data for bins with coordinates
-  const bins = [
-    { id: 1, name: 'Central Park UCO Bin', distance: '0.8 km', status: 'Active', fillLevel: 45, lat: 40.7812, lng: -73.9665 },
-    { id: 2, name: 'Downtown Community Center', distance: '1.2 km', status: 'Active', fillLevel: 80, lat: 40.7750, lng: -73.9700 },
-    { id: 3, name: 'Westside Supermarket', distance: '2.5 km', status: 'Full', fillLevel: 100, lat: 40.7850, lng: -73.9800 },
-  ];
+  // Function to generate mock bins around a location
+  const generateNearbyBins = useCallback((lat: number, lng: number) => {
+    const newBins = [
+      { id: 1, name: 'Community Recycling Hub', distance: '0.4 km', status: 'Active', fillLevel: 45, lat: lat + 0.002, lng: lng + 0.003, type: 'eco' as const },
+      { id: 2, name: 'Green Point Center', distance: '0.9 km', status: 'Active', fillLevel: 80, lat: lat - 0.004, lng: lng + 0.001, type: 'eco' as const },
+      { id: 3, name: 'Eco-Collection Station', distance: '1.2 km', status: 'Full', fillLevel: 100, lat: lat + 0.005, lng: lng - 0.002, type: 'eco' as const },
+      { id: 4, name: 'Neighborhood Eco-Bin', distance: '1.8 km', status: 'Active', fillLevel: 20, lat: lat - 0.001, lng: lng - 0.005, type: 'eco' as const },
+      { id: 5, name: 'UCO Collection Point', distance: '0.6 km', status: 'Active', fillLevel: 30, lat: lat + 0.001, lng: lng - 0.001, type: 'uco' as const },
+      { id: 6, name: 'UCO Disposal Hub', distance: '2.1 km', status: 'Active', fillLevel: 60, lat: lat - 0.003, lng: lng + 0.004, type: 'uco' as const },
+    ];
+    setBins(newBins);
+  }, []);
 
-  const userLocation = { lat: 40.7800, lng: -73.9700 };
+  const handleLocateUser = useCallback(() => {
+    if (!navigator.geolocation) {
+      alert('Geolocation is not supported by your browser');
+      return;
+    }
+
+    setIsLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude, accuracy } = position.coords;
+        setUserLocation({ lat: latitude, lng: longitude });
+        setLocationAccuracy(accuracy);
+        generateNearbyBins(latitude, longitude);
+        setIsLocating(false);
+      },
+      (error) => {
+        console.error('Error getting location:', error);
+        setIsLocating(false);
+      },
+      { 
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
+      }
+    );
+  }, [generateNearbyBins]);
+
+  // Initialize with default bins
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      generateNearbyBins(3.1390, 101.6869);
+      handleLocateUser();
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [generateNearbyBins, handleLocateUser]);
 
   return (
     <div className="flex flex-col h-full bg-gray-50 relative">
@@ -33,19 +77,27 @@ export default function EcoLocator({ onBack }: EcoLocatorProps) {
       </div>
 
       {/* Map Area */}
-      <div className="flex-1 relative bg-blue-50 z-0 overflow-hidden">
-        <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/cubes.png")' }}></div>
-        <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4 shadow-lg">
-            <Navigation size={32} className="text-blue-600" />
-          </div>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">Interactive Map</h2>
-          <p className="text-gray-500 text-center max-w-xs">Map view is currently disabled in this prototype environment.</p>
-        </div>
+      <div className="flex-1 relative bg-blue-50 z-0">
+        <MapComponent 
+          bins={bins} 
+          userLocation={userLocation} 
+          locationAccuracy={locationAccuracy}
+          selectedBin={selectedBin} 
+          setSelectedBin={setSelectedBin} 
+        />
+        
+        {/* Locate Me Button */}
+        <button 
+          onClick={handleLocateUser}
+          className={`absolute bottom-64 right-4 p-3 bg-white rounded-full shadow-lg z-[1000] transition-all active:scale-95 ${isLocating ? 'animate-pulse text-blue-500' : 'text-gray-700'}`}
+          title="Locate Me"
+        >
+          <LocateFixed size={24} />
+        </button>
       </div>
 
       {/* Bottom Sheet (Nearby Bins) */}
-      <div className="bg-white rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.1)] z-[1000] pb-6 absolute bottom-0 left-0 right-0 max-h-[50vh] flex flex-col">
+      <div className="bg-white rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.1)] z-[1000] pb-6 absolute bottom-0 left-0 right-0 max-h-[45vh] flex flex-col">
         <div className="w-12 h-1.5 bg-gray-200 rounded-full mx-auto my-3 shrink-0"></div>
         <div className="px-6 flex-1 overflow-y-auto">
           <h2 className="text-lg font-bold text-gray-900 mb-4">Nearby Drop-off Points</h2>

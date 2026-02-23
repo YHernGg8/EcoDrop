@@ -1,8 +1,7 @@
 'use client';
 
-import { MapContainer, TileLayer, Marker, Popup, ZoomControl } from 'react-leaflet';
+import { useEffect, useState } from 'react';
 import 'leaflet/dist/leaflet.css';
-import * as L from 'leaflet';
 
 interface Bin {
   id: number;
@@ -12,22 +11,68 @@ interface Bin {
   fillLevel: number;
   lat: number;
   lng: number;
+  type?: 'eco' | 'uco';
 }
 
 interface MapComponentProps {
   bins: Bin[];
   userLocation: { lat: number; lng: number };
+  locationAccuracy: number | null;
   selectedBin: number | null;
   setSelectedBin: (id: number) => void;
 }
 
-export default function MapComponent({ bins, userLocation, selectedBin, setSelectedBin }: MapComponentProps) {
-  const createIcon = (fillLevel: number) => {
-    const color = fillLevel >= 90 ? '#ef4444' : fillLevel >= 70 ? '#eab308' : '#16a34a';
+export default function MapComponent({ bins, userLocation, locationAccuracy, selectedBin, setSelectedBin }: MapComponentProps) {
+  const [MapLib, setMapLib] = useState<any>(null);
+
+  useEffect(() => {
+    // Load Leaflet and React-Leaflet only on the client
+    const loadMap = async () => {
+      try {
+        const L = (await import('leaflet')).default;
+        const ReactLeaflet = await import('react-leaflet');
+        const MarkerClusterGroup = (await import('react-leaflet-cluster')).default;
+
+        setMapLib({
+          L,
+          ...ReactLeaflet,
+          MarkerClusterGroup
+        });
+      } catch (error) {
+        console.error('Failed to load map libraries:', error);
+      }
+    };
+
+    loadMap();
+  }, []);
+
+  if (!MapLib) {
+    return (
+      <div className="w-full h-full flex items-center justify-center bg-blue-50">
+        <div className="animate-pulse flex flex-col items-center">
+          <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-2"></div>
+          <p className="text-blue-600 font-medium">Initializing Map...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const { MapContainer, TileLayer, Marker, Popup, ZoomControl, useMap, MarkerClusterGroup, Circle, L } = MapLib;
+
+  function ChangeView({ center }: { center: [number, number] }) {
+    const map = useMap();
+    useEffect(() => {
+      map.setView(center, map.getZoom());
+    }, [center, map]);
+    return null;
+  }
+
+  const createIcon = (fillLevel: number, type?: 'eco' | 'uco') => {
+    const color = type === 'uco' ? '#f97316' : (fillLevel >= 90 ? '#ef4444' : fillLevel >= 70 ? '#eab308' : '#16a34a');
     
     return L.divIcon({
       className: 'custom-leaflet-icon',
-      html: `<div style="background-color: ${color}; width: 24px; height: 24px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>`,
+      html: `<div style="background-color: ${color}; width: 24px; height: 24px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; color: white; font-size: 10px; font-weight: bold;">${type === 'uco' ? 'U' : ''}</div>`,
       iconSize: [24, 24],
       iconAnchor: [12, 12]
     });
@@ -51,37 +96,70 @@ export default function MapComponent({ bins, userLocation, selectedBin, setSelec
       zoomControl={false}
       style={{ height: '100%', width: '100%' }}
     >
+      <ChangeView center={[userLocation.lat, userLocation.lng]} />
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
       />
       <ZoomControl position="topright" />
       
+      {/* Accuracy Circle */}
+      {locationAccuracy && (
+        <Circle
+          center={[userLocation.lat, userLocation.lng]}
+          radius={locationAccuracy}
+          pathOptions={{
+            fillColor: '#3b82f6',
+            fillOpacity: 0.15,
+            color: '#3b82f6',
+            weight: 1,
+            dashArray: '5, 5'
+          }}
+        />
+      )}
+
       {/* User Location */}
       <Marker position={[userLocation.lat, userLocation.lng]} icon={userIcon}>
-        <Popup>You are here</Popup>
+        <Popup>
+          <div className="text-center">
+            <p className="font-semibold">You are here</p>
+            {locationAccuracy && (
+              <p className="text-xs text-gray-500 mt-1">
+                Accuracy: ±{Math.round(locationAccuracy)}m
+              </p>
+            )}
+          </div>
+        </Popup>
       </Marker>
 
-      {/* Bins */}
-      {bins.map((bin) => {
-        const icon = createIcon(bin.fillLevel);
-        
-        return (
-          <Marker 
-            key={bin.id} 
-            position={[bin.lat, bin.lng]} 
-            icon={icon}
-            eventHandlers={{
-              click: () => setSelectedBin(bin.id),
-            }}
-          >
-            <Popup>
-              <div className="font-semibold">{bin.name}</div>
-              <div className="text-sm text-gray-600">{bin.fillLevel}% Full</div>
-            </Popup>
-          </Marker>
-        );
-      })}
+      {/* Bins with Clustering */}
+      <MarkerClusterGroup
+        chunkedLoading
+        maxClusterRadius={60}
+      >
+        {bins.map((bin: Bin) => {
+          const icon = createIcon(bin.fillLevel, bin.type);
+          
+          return (
+            <Marker 
+              key={bin.id} 
+              position={[bin.lat, bin.lng]} 
+              icon={icon}
+              eventHandlers={{
+                click: () => setSelectedBin(bin.id),
+              }}
+            >
+              <Popup>
+                <div className="font-semibold">{bin.name}</div>
+                <div className="text-sm text-gray-600">
+                  {bin.type === 'uco' ? 'Used Cooking Oil' : 'Eco-Bin'}
+                </div>
+                <div className="text-sm text-gray-600">{bin.fillLevel}% Full</div>
+              </Popup>
+            </Marker>
+          );
+        })}
+      </MarkerClusterGroup>
     </MapContainer>
   );
 }
