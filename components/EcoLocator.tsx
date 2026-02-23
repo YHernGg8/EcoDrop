@@ -33,13 +33,15 @@ export default function EcoLocator({ onBack }: EcoLocatorProps) {
       </div>
 
       {/* Map Area */}
-      <div className="flex-1 relative bg-blue-50 z-0">
-        <MapComponent 
-          bins={bins} 
-          userLocation={userLocation} 
-          selectedBin={selectedBin} 
-          setSelectedBin={setSelectedBin} 
-        />
+      <div className="flex-1 relative bg-blue-50 z-0 overflow-hidden">
+        <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/cubes.png")' }}></div>
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4 shadow-lg">
+            <Navigation size={32} className="text-blue-600" />
+          </div>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">Interactive Map</h2>
+          <p className="text-gray-500 text-center max-w-xs">Map view is currently disabled in this prototype environment.</p>
+        </div>
       </div>
 
       {/* Bottom Sheet (Nearby Bins) */}

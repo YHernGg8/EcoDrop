@@ -2,7 +2,7 @@
 
 import { MapContainer, TileLayer, Marker, Popup, ZoomControl } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
+import * as L from 'leaflet';
 
 interface Bin {
   id: number;
@@ -33,12 +33,16 @@ export default function MapComponent({ bins, userLocation, selectedBin, setSelec
     });
   };
 
-  const userIcon = L.divIcon({
-    className: 'user-leaflet-icon',
-    html: `<div style="background-color: #3b82f6; width: 16px; height: 16px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3);"></div>`,
-    iconSize: [16, 16],
-    iconAnchor: [8, 8]
-  });
+  const getUserIcon = () => {
+    return L.divIcon({
+      className: 'user-leaflet-icon',
+      html: `<div style="background-color: #3b82f6; width: 16px; height: 16px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3);"></div>`,
+      iconSize: [16, 16],
+      iconAnchor: [8, 8]
+    });
+  };
+
+  const userIcon = getUserIcon();
 
   return (
     <MapContainer 

@@ -185,42 +185,89 @@ export default function SmartScan({ onComplete, onBack }: SmartScanProps) {
                     </div>
                   </div>
 
-                  <div className="space-y-3 mb-6">
-                    <div className="flex items-start gap-3 bg-gray-50 p-3 rounded-xl">
-                      <CheckCircle2 size={20} className="text-green-500 mt-0.5 shrink-0" />
-                      <p className="text-sm">{result.reasoning}</p>
+                  <div className="space-y-4 mb-6">
+                    {/* Grade Banner */}
+                    <div className={`flex items-center gap-4 p-4 rounded-2xl border ${
+                      result.grade === 'A' ? 'bg-green-50 border-green-200' : 
+                      result.grade === 'B' ? 'bg-yellow-50 border-yellow-200' : 
+                      'bg-red-50 border-red-200'
+                    }`}>
+                      <div className={`w-14 h-14 rounded-full flex items-center justify-center text-3xl font-black shrink-0 ${
+                        result.grade === 'A' ? 'bg-green-100 text-green-600' : 
+                        result.grade === 'B' ? 'bg-yellow-100 text-yellow-600' : 
+                        'bg-red-100 text-red-600'
+                      }`}>
+                        {result.grade}
+                      </div>
+                      <div>
+                        <h4 className={`font-bold text-lg ${
+                          result.grade === 'A' ? 'text-green-800' : 
+                          result.grade === 'B' ? 'text-yellow-800' : 
+                          'text-red-800'
+                        }`}>
+                          {result.grade === 'A' ? 'Premium UCO' : result.grade === 'B' ? 'Standard UCO' : 'Low-grade UCO'}
+                        </h4>
+                        <p className={`text-sm leading-tight mt-1 ${
+                          result.grade === 'A' ? 'text-green-700' : 
+                          result.grade === 'B' ? 'text-yellow-700' : 
+                          'text-red-700'
+                        }`}>
+                          {result.reasoning}
+                        </p>
+                      </div>
                     </div>
 
+                    {/* Metrics Grid */}
                     <div className="grid grid-cols-2 gap-3">
-                      <div className="bg-gray-50 p-3 rounded-xl">
-                        <div className="text-xs text-gray-500 mb-1">Estimated Purity</div>
-                        <div className="font-bold text-lg text-gray-900">{result.purityPercentage}%</div>
+                      <div className="bg-gray-50 border border-gray-100 p-4 rounded-2xl flex flex-col items-center justify-center text-center">
+                        <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Purity</div>
+                        <div className="relative w-16 h-16 flex items-center justify-center">
+                          <svg className="w-full h-full transform -rotate-90 absolute inset-0">
+                            <circle cx="32" cy="32" r="28" stroke="currentColor" strokeWidth="6" fill="transparent" className="text-gray-200" />
+                            <circle 
+                              cx="32" cy="32" r="28" 
+                              stroke="currentColor" 
+                              strokeWidth="6" 
+                              fill="transparent" 
+                              strokeDasharray="175.9" 
+                              strokeDashoffset={175.9 - (175.9 * result.purityPercentage) / 100}
+                              className={result.purityPercentage >= 80 ? 'text-green-500' : result.purityPercentage >= 50 ? 'text-yellow-500' : 'text-red-500'} 
+                            />
+                          </svg>
+                          <span className="font-bold text-lg text-gray-900 relative z-10">{result.purityPercentage}%</span>
+                        </div>
                       </div>
-                      <div className="bg-gray-50 p-3 rounded-xl">
-                        <div className="text-xs text-gray-500 mb-1">Water Content</div>
-                        <div className={`font-bold text-lg ${
-                          result.waterContent === 'Low' ? 'text-green-600' :
-                          result.waterContent === 'Medium' ? 'text-yellow-600' :
-                          'text-red-600'
+                      
+                      <div className="bg-gray-50 border border-gray-100 p-4 rounded-2xl flex flex-col items-center justify-center text-center">
+                        <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Water</div>
+                        <div className={`w-16 h-16 rounded-full flex items-center justify-center border-4 ${
+                          result.waterContent === 'Low' ? 'border-green-100 bg-green-50 text-green-600' :
+                          result.waterContent === 'Medium' ? 'border-yellow-100 bg-yellow-50 text-yellow-600' :
+                          'border-red-100 bg-red-50 text-red-600'
                         }`}>
-                          {result.waterContent}
+                          <span className="font-bold text-sm uppercase tracking-wide">{result.waterContent}</span>
                         </div>
                       </div>
                     </div>
                     
+                    {/* Warnings */}
                     {result.debrisDetected && (
-                      <div className="flex items-start gap-3 bg-orange-50 p-3 rounded-xl">
+                      <div className="flex items-start gap-3 bg-orange-50 border border-orange-100 p-4 rounded-2xl">
                         <AlertTriangle size={20} className="text-orange-500 mt-0.5 shrink-0" />
-                        <p className="text-sm text-orange-800">Debris detected. Please filter your oil next time for maximum points.</p>
+                        <div>
+                          <h5 className="font-semibold text-orange-800 text-sm">Debris Detected</h5>
+                          <p className="text-xs text-orange-700 mt-1 leading-relaxed">Please filter your oil next time to achieve a higher grade and earn more points.</p>
+                        </div>
                       </div>
                     )}
                   </div>
 
                   <button 
                     onClick={handleClaimPoints}
-                    className="w-full bg-gray-900 text-white font-bold py-4 rounded-xl hover:bg-gray-800 transition-colors"
+                    className="w-full bg-gray-900 text-white font-bold py-4 rounded-xl hover:bg-gray-800 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-gray-200"
                   >
-                    Claim {result.grade === 'A' ? 50 : result.grade === 'B' ? 30 : 10} Points
+                    <span>Claim {result.grade === 'A' ? 50 : result.grade === 'B' ? 30 : 10} Points</span>
+                    <ArrowLeft size={18} className="rotate-180" />
                   </button>
                 </motion.div>
               )}
