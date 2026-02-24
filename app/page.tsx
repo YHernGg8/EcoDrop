@@ -8,10 +8,13 @@ import EcoLocator from '@/components/EcoLocator';
 import B2BPortal from '@/components/B2BPortal';
 import BottomNav from '@/components/BottomNav';
 import UserProfile from '@/components/UserProfile';
+import AuthPage from '@/components/AuthPage';
+import { useAuth } from '@/hooks/useAuth';
 
 export type ViewState = 'dashboard' | 'scan' | 'locator' | 'rewards' | 'b2b' | 'profile';
 
 export default function App() {
+  const { user, loading } = useAuth();
   const [currentView, setCurrentView] = useState<ViewState>('dashboard');
   const [points, setPoints] = useState(1250);
   const [carbonOffset, setCarbonOffset] = useState(12.4);
@@ -20,6 +23,18 @@ export default function App() {
     setPoints(prev => prev + earnedPoints);
     setCarbonOffset(prev => prev + (earnedPoints * 0.01)); // Rough estimate
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-100">
+        <div className="w-16 h-16 border-4 border-green-500 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <AuthPage />;
+  }
 
   return (
     <div className="flex justify-center bg-gray-100 min-h-screen font-sans text-gray-900">

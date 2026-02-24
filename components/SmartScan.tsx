@@ -112,6 +112,12 @@ export default function SmartScan({ onComplete, onBack }: SmartScanProps) {
     onBack();
   };
 
+  const handleScanAgain = () => {
+    setImage(null);
+    setResult(null);
+    setError(null);
+  };
+
   return (
     <div className="flex flex-col h-full bg-black text-white relative">
       {/* Header */}
@@ -262,13 +268,21 @@ export default function SmartScan({ onComplete, onBack }: SmartScanProps) {
                     )}
                   </div>
 
-                  <button 
-                    onClick={handleClaimPoints}
-                    className="w-full bg-gray-900 text-white font-bold py-4 rounded-xl hover:bg-gray-800 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-gray-200"
-                  >
-                    <span>Claim {result.grade === 'A' ? 50 : result.grade === 'B' ? 30 : 10} Points</span>
-                    <ArrowLeft size={18} className="rotate-180" />
-                  </button>
+                  <div className="flex items-center gap-3 mt-6">
+                    <button 
+                      onClick={handleScanAgain}
+                      className="w-full bg-gray-200 text-gray-800 font-bold py-4 rounded-xl hover:bg-gray-300 transition-colors"
+                    >
+                      Scan Again
+                    </button>
+                    <button 
+                      onClick={handleClaimPoints}
+                      className="w-full bg-gray-900 text-white font-bold py-4 rounded-xl hover:bg-gray-800 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-gray-200"
+                    >
+                      <span>Claim {result.grade === 'A' ? 50 : result.grade === 'B' ? 30 : 10} Points</span>
+                      <ArrowLeft size={18} className="rotate-180" />
+                    </button>
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>
