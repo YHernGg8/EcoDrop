@@ -61,4 +61,7 @@ To test the application on your local machine, please follow these steps:
   - Architecture, state management, styling conventions
 
 ---
+
+## License
+
 Copyright © 2026 ChiliPanMee - KitaHack2026. All rights reserved.
