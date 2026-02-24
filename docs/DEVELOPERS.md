@@ -6,7 +6,7 @@ Complete technical reference for developers working on the EcoDrop Website.
 
 ## Project Overview
 
-This is a **dynamic web application** for the EcoDrop initiative, developed for KitaHack2026 by students at Universiti Sains Malaysia (USM). The platform enables users to identify recyclable materials via AI, locate nearby recycling centers, and track their environmental impact.
+This is a **dynamic web application** for the EcoDrop initiative, developed for KitaHack2026 by students at Taylors University, Universiti Teknologi Malaysia (UTM) and Universiti Sains Malaysia (USM). The platform enables users to identify recyclable materials via AI, locate nearby recycling centers, and track their environmental impact.
 
 **Key Characteristics:**
 
