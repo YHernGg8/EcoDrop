@@ -120,12 +120,15 @@ export default function EcoLocator({ onBack }: EcoLocatorProps) {
       </div>
 
       {/* Bottom Sheet (Nearby Bins) */}
-      <div className="bg-white rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.1)] z-[1000] pb-6 absolute bottom-0 left-0 right-0 max-h-[45vh] flex flex-col">
+      <div className="bg-white rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.1)] z-[1000] pb-24 absolute bottom-0 left-0 right-0 max-h-[50vh] flex flex-col border-t border-gray-100">
         <div className="w-12 h-1.5 bg-gray-200 rounded-full mx-auto my-3 shrink-0"></div>
-        <div className="px-6 flex-1 overflow-y-auto">
-          <h2 className="text-lg font-bold text-gray-900 mb-4">Nearby Drop-off Points</h2>
+        <div className="px-6 flex-1 overflow-y-auto custom-scrollbar">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-bold text-gray-900">Nearby Drop-off Points</h2>
+            <span className="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full">{bins.length} locations found</span>
+          </div>
           
-          <div className="space-y-4 pb-4">
+          <div className="space-y-3 pb-4">
             {bins.map((bin) => (
               <div 
                 key={bin.id} 

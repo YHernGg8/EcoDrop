@@ -16,6 +16,7 @@ interface ScanResult {
   reasoning: string;
   purityPercentage: number;
   waterContent: 'Low' | 'Medium' | 'High';
+  oilType: 'Vegetable' | 'Animal Fat' | 'Mixed' | 'Unknown';
 }
 
 interface ScanError {
@@ -75,8 +76,7 @@ export default function SmartScan({ onComplete, onBack }: SmartScanProps) {
                 3. reasoning: A short 1-sentence explanation of why you gave this grade.
                 4. purityPercentage: A number from 0 to 100 representing the estimated purity of the oil.
                 5. waterContent: "Low", "Medium", or "High" representing the estimated water content.
-                
-                If the image does not contain cooking oil or is too blurry to analyze, return an error message in the reasoning field and set grade to "C".` 
+                6. oilType: "Vegetable", "Animal Fat", "Mixed", or "Unknown" based on the visual characteristics of the oil.`
               },
               { 
                 inlineData: { 
@@ -96,9 +96,10 @@ export default function SmartScan({ onComplete, onBack }: SmartScanProps) {
               debrisDetected: { type: Type.BOOLEAN },
               reasoning: { type: Type.STRING },
               purityPercentage: { type: Type.NUMBER },
-              waterContent: { type: Type.STRING }
+              waterContent: { type: Type.STRING },
+              oilType: { type: Type.STRING }
             },
-            required: ["grade", "debrisDetected", "reasoning", "purityPercentage", "waterContent"]
+            required: ["grade", "debrisDetected", "reasoning", "purityPercentage", "waterContent", "oilType"]
           }
         }
       });
@@ -245,10 +246,18 @@ export default function SmartScan({ onComplete, onBack }: SmartScanProps) {
                       />
                     </div>
                     
-                    <div className="mt-4 flex gap-2">
-                      <span className="text-[10px] uppercase tracking-[0.2em] text-white/40">Spectroscopy</span>
-                      <span className="text-[10px] uppercase tracking-[0.2em] text-white/40">•</span>
-                      <span className="text-[10px] uppercase tracking-[0.2em] text-white/40">Viscosity</span>
+                    <div className="mt-8">
+                      <button 
+                        onClick={() => {
+                          // A more robust solution would cancel the API request
+                          setIsAnalyzing(false);
+                          setImage(null);
+                          setError(null);
+                        }}
+                        className="text-white/50 text-xs font-semibold uppercase tracking-widest hover:text-white transition-colors"
+                      >
+                        Cancel
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -309,7 +318,7 @@ export default function SmartScan({ onComplete, onBack }: SmartScanProps) {
                     </div>
 
                     {/* Metrics Grid */}
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-3 gap-3">
                       <div className="bg-gray-50 border border-gray-100 p-4 rounded-2xl flex flex-col items-center justify-center text-center">
                         <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Purity</div>
                         <div className="relative w-16 h-16 flex items-center justify-center">
@@ -329,6 +338,13 @@ export default function SmartScan({ onComplete, onBack }: SmartScanProps) {
                         </div>
                       </div>
                       
+                      <div className="bg-gray-50 border border-gray-100 p-4 rounded-2xl flex flex-col items-center justify-center text-center">
+                        <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Oil Type</div>
+                        <div className="w-16 h-16 rounded-full flex items-center justify-center bg-gray-100 text-gray-800">
+                          <span className="font-bold text-sm text-center leading-tight">{result.oilType}</span>
+                        </div>
+                      </div>
+
                       <div className="bg-gray-50 border border-gray-100 p-4 rounded-2xl flex flex-col items-center justify-center text-center">
                         <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Water</div>
                         <div className={`w-16 h-16 rounded-full flex items-center justify-center border-4 ${

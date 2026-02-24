@@ -1,10 +1,27 @@
+import { useEffect, useRef } from 'react';
 import { ViewState } from '@/app/page';
 import { Droplet, MapPin, Leaf, ChevronRight, ArrowRight } from 'lucide-react';
+import { motion, useMotionValue, useSpring, useTransform, animate } from 'motion/react';
 
 interface DashboardProps {
   points: number;
   carbonOffset: number;
   onNavigate: (view: ViewState) => void;
+}
+
+function Counter({ value, decimals = 0 }: { value: number; decimals?: number }) {
+  const count = useMotionValue(0);
+  const rounded = useTransform(count, (latest) => latest.toFixed(decimals));
+
+  useEffect(() => {
+    const controls = animate(count, value, {
+      duration: 2,
+      ease: "easeOut",
+    });
+    return () => controls.stop();
+  }, [count, value]);
+
+  return <motion.span>{rounded}</motion.span>;
 }
 
 export default function Dashboard({ points, carbonOffset, onNavigate }: DashboardProps) {
@@ -26,20 +43,34 @@ export default function Dashboard({ points, carbonOffset, onNavigate }: Dashboar
 
       {/* Impact Cards */}
       <div className="grid grid-cols-2 gap-4">
-        <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-3xl p-5 text-white shadow-lg shadow-green-200">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-gradient-to-br from-green-500 to-green-600 rounded-3xl p-5 text-white shadow-lg shadow-green-200"
+        >
           <div className="flex items-center gap-2 mb-2 opacity-90">
             <Leaf size={18} />
             <span className="text-xs font-medium uppercase tracking-wider">Green Points</span>
           </div>
-          <div className="text-3xl font-bold">{Math.floor(points)}</div>
-        </div>
-        <div className="bg-white rounded-3xl p-5 border border-gray-100 shadow-sm">
+          <div className="text-3xl font-bold">
+            <Counter value={points} />
+          </div>
+        </motion.div>
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="bg-white rounded-3xl p-5 border border-gray-100 shadow-sm"
+        >
           <div className="flex items-center gap-2 mb-2 text-gray-500">
             <Droplet size={18} className="text-blue-500" />
             <span className="text-xs font-medium uppercase tracking-wider">CO₂ Offset</span>
           </div>
-          <div className="text-3xl font-bold text-gray-900">{carbonOffset.toFixed(1)}<span className="text-sm font-normal text-gray-500 ml-1">kg</span></div>
-        </div>
+          <div className="text-3xl font-bold text-gray-900">
+            <Counter value={carbonOffset} decimals={1} />
+            <span className="text-sm font-normal text-gray-500 ml-1">kg</span>
+          </div>
+        </motion.div>
       </div>
 
       {/* Quick Actions */}
