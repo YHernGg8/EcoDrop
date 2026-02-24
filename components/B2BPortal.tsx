@@ -35,7 +35,11 @@ export default function B2BPortal() {
     return (
       <div className="p-6 h-full flex flex-col bg-white overflow-y-auto pb-24">
         <header className="flex items-center gap-4 mb-6 pt-4">
-          <button onClick={() => setIsScheduling(false)} className="p-2 bg-gray-50 hover:bg-gray-100 rounded-full transition-colors">
+          <button 
+            onClick={() => setIsScheduling(false)} 
+            className="p-2 bg-gray-50 hover:bg-gray-100 rounded-full transition-colors"
+            aria-label="Go back to dashboard"
+          >
             <ArrowLeft size={20} className="text-gray-900" />
           </button>
           <h1 className="text-xl font-bold text-gray-900">Schedule Pickup</h1>
@@ -53,34 +57,58 @@ export default function B2BPortal() {
           <form onSubmit={handleSchedule} className="flex-1 flex flex-col">
             <div className="space-y-5 flex-1">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Restaurant Name</label>
+                <label htmlFor="restaurant-name" className="block text-sm font-medium text-gray-700 mb-1">Restaurant Name</label>
                 <div className="relative">
                   <Building2 size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input required type="text" defaultValue="Burger King - Downtown" className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all" />
+                  <input 
+                    id="restaurant-name"
+                    required 
+                    type="text" 
+                    defaultValue="Burger King - Downtown" 
+                    className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all" 
+                  />
                 </div>
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Estimated Volume (Liters)</label>
+                <label htmlFor="volume" className="block text-sm font-medium text-gray-700 mb-1">Estimated Volume (Liters)</label>
                 <div className="relative">
                   <Droplets size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input required type="number" min="20" placeholder="Minimum 20L" className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all" />
+                  <input 
+                    id="volume"
+                    required 
+                    type="number" 
+                    min="20" 
+                    placeholder="Minimum 20L" 
+                    className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all" 
+                  />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Preferred Date & Time</label>
+                <label htmlFor="pickup-time" className="block text-sm font-medium text-gray-700 mb-1">Preferred Date & Time</label>
                 <div className="relative">
                   <CalendarPlus size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input required type="datetime-local" className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all" />
+                  <input 
+                    id="pickup-time"
+                    required 
+                    type="datetime-local" 
+                    className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all" 
+                  />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Pickup Address</label>
+                <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">Pickup Address</label>
                 <div className="relative">
                   <MapPin size={18} className="absolute left-3 top-3 text-gray-400" />
-                  <textarea required rows={3} placeholder="Full address..." className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all resize-none"></textarea>
+                  <textarea 
+                    id="address"
+                    required 
+                    rows={3} 
+                    placeholder="Full address..." 
+                    className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all resize-none"
+                  ></textarea>
                 </div>
               </div>
             </div>
@@ -116,7 +144,11 @@ export default function B2BPortal() {
       </div>
 
       {/* Action */}
-      <button onClick={() => setIsScheduling(true)} className="w-full bg-gray-900 text-white rounded-2xl p-4 flex items-center justify-between hover:bg-gray-800 transition-colors shadow-md">
+      <button 
+        onClick={() => setIsScheduling(true)} 
+        className="w-full bg-gray-900 text-white rounded-2xl p-4 flex items-center justify-between hover:bg-gray-800 transition-colors shadow-md"
+        aria-label="Schedule a bulk oil pickup for volumes greater than 20 liters"
+      >
          <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
               <Truck size={24} className="text-blue-400" />
@@ -133,7 +165,12 @@ export default function B2BPortal() {
       <section>
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-bold text-gray-900">Your Pickups</h2>
-          <button className="text-sm text-blue-600 font-medium">View All</button>
+          <button 
+            className="text-sm text-blue-600 font-medium"
+            aria-label="View all pickup history"
+          >
+            View All
+          </button>
         </div>
         <div className="space-y-3">
           {pickups.map(pickup => (

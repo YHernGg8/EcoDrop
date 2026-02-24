@@ -18,11 +18,16 @@ interface ScanResult {
   waterContent: 'Low' | 'Medium' | 'High';
 }
 
+interface ScanError {
+  message: string;
+  suggestion: string;
+}
+
 export default function SmartScan({ onComplete, onBack }: SmartScanProps) {
   const [image, setImage] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [result, setResult] = useState<ScanResult | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<ScanError | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -44,7 +49,13 @@ export default function SmartScan({ onComplete, onBack }: SmartScanProps) {
 
     try {
       const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
-      if (!apiKey) throw new Error("Gemini API key is missing.");
+      if (!apiKey) {
+        setError({
+          message: "System Configuration Error",
+          suggestion: "Gemini API key is missing. Please check your environment variables."
+        });
+        return;
+      }
 
       const ai = new GoogleGenAI({ apiKey });
       
@@ -63,7 +74,9 @@ export default function SmartScan({ onComplete, onBack }: SmartScanProps) {
                 2. debrisDetected: true or false (if there are significant food particles).
                 3. reasoning: A short 1-sentence explanation of why you gave this grade.
                 4. purityPercentage: A number from 0 to 100 representing the estimated purity of the oil.
-                5. waterContent: "Low", "Medium", or "High" representing the estimated water content.` 
+                5. waterContent: "Low", "Medium", or "High" representing the estimated water content.
+                
+                If the image does not contain cooking oil or is too blurry to analyze, return an error message in the reasoning field and set grade to "C".` 
               },
               { 
                 inlineData: { 
@@ -92,13 +105,35 @@ export default function SmartScan({ onComplete, onBack }: SmartScanProps) {
 
       if (response.text) {
         const parsedResult = JSON.parse(response.text) as ScanResult;
+        
+        // Check if AI actually found oil
+        if (parsedResult.reasoning.toLowerCase().includes("no oil") || 
+            parsedResult.reasoning.toLowerCase().includes("cannot see") ||
+            parsedResult.reasoning.toLowerCase().includes("blurry")) {
+          setError({
+            message: "Analysis Unclear",
+            suggestion: "The AI couldn't clearly identify the oil. Please ensure the photo is well-lit and the oil is clearly visible in a transparent container."
+          });
+          return;
+        }
+
         setResult(parsedResult);
       } else {
-        throw new Error("No response from AI.");
+        throw new Error("Empty response");
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      setError("Failed to analyze image. Please try again.");
+      if (err.message?.includes("fetch")) {
+        setError({
+          message: "Connection Error",
+          suggestion: "Please check your internet connection and try again."
+        });
+      } else {
+        setError({
+          message: "Analysis Failed",
+          suggestion: "Something went wrong during the AI analysis. Please try taking a clearer photo."
+        });
+      }
     } finally {
       setIsAnalyzing(false);
     }
@@ -163,9 +198,59 @@ export default function SmartScan({ onComplete, onBack }: SmartScanProps) {
               <img src={image} alt="Scanned Oil" className="w-full h-full object-cover" />
               
               {isAnalyzing && (
-                <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center">
-                  <Loader2 size={48} className="text-green-500 animate-spin mb-4" />
-                  <p className="text-lg font-medium animate-pulse">Analyzing Purity...</p>
+                <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] flex flex-col items-center justify-center overflow-hidden">
+                  {/* Scanning Beam Animation */}
+                  <motion.div 
+                    initial={{ top: '0%' }}
+                    animate={{ top: '100%' }}
+                    transition={{ 
+                      duration: 2, 
+                      repeat: Infinity, 
+                      ease: "linear" 
+                    }}
+                    className="absolute left-0 right-0 h-1 bg-green-500 shadow-[0_0_15px_rgba(34,197,94,0.8)] z-20"
+                  />
+                  
+                  {/* Scanning Grid Overlay */}
+                  <div className="absolute inset-0 opacity-20 pointer-events-none" 
+                    style={{ 
+                      backgroundImage: 'linear-gradient(rgba(34,197,94,0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(34,197,94,0.2) 1px, transparent 1px)',
+                      backgroundSize: '20px 20px'
+                    }} 
+                  />
+
+                  <div className="relative z-30 flex flex-col items-center bg-black/60 p-8 rounded-3xl border border-white/10 backdrop-blur-md">
+                    <div className="relative mb-6">
+                      <Loader2 size={64} className="text-green-500 animate-spin opacity-20" />
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <motion.div
+                          animate={{ scale: [1, 1.2, 1] }}
+                          transition={{ duration: 1.5, repeat: Infinity }}
+                        >
+                          <Camera size={32} className="text-green-500" />
+                        </motion.div>
+                      </div>
+                    </div>
+                    
+                    <h3 className="text-xl font-bold text-white mb-2 tracking-tight">EcoDrop Vision AI</h3>
+                    <p className="text-green-400 text-sm font-medium animate-pulse mb-6">Analyzing Oil Purity...</p>
+                    
+                    {/* Simulated Progress Bar */}
+                    <div className="w-48 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                      <motion.div 
+                        initial={{ width: '0%' }}
+                        animate={{ width: '100%' }}
+                        transition={{ duration: 3, ease: "easeInOut" }}
+                        className="h-full bg-green-500"
+                      />
+                    </div>
+                    
+                    <div className="mt-4 flex gap-2">
+                      <span className="text-[10px] uppercase tracking-[0.2em] text-white/40">Spectroscopy</span>
+                      <span className="text-[10px] uppercase tracking-[0.2em] text-white/40">•</span>
+                      <span className="text-[10px] uppercase tracking-[0.2em] text-white/40">Viscosity</span>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
@@ -288,15 +373,47 @@ export default function SmartScan({ onComplete, onBack }: SmartScanProps) {
             </AnimatePresence>
 
             {error && !isAnalyzing && (
-              <div className="bg-red-500 text-white p-4 rounded-2xl mb-6">
-                <p className="font-medium">{error}</p>
-                <button 
-                  onClick={() => setImage(null)}
-                  className="mt-2 text-sm underline"
-                >
-                  Try Again
-                </button>
-              </div>
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="bg-white text-gray-900 rounded-3xl p-6 shadow-2xl border-t-4 border-red-500"
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-600">
+                    <AlertTriangle size={20} />
+                  </div>
+                  <h3 className="font-bold text-lg">{error.message}</h3>
+                </div>
+                
+                <p className="text-gray-600 text-sm mb-6 leading-relaxed">
+                  {error.suggestion}
+                </p>
+
+                <div className="flex flex-col gap-3">
+                  <button 
+                    onClick={() => {
+                      setError(null);
+                      if (image && fileInputRef.current) {
+                        // Re-analyze existing image
+                        const mimeType = image.split(';')[0].split(':')[1];
+                        analyzeImage(image, mimeType);
+                      }
+                    }}
+                    className="w-full bg-gray-900 text-white font-bold py-4 rounded-xl hover:bg-gray-800 transition-colors"
+                  >
+                    Retry Analysis
+                  </button>
+                  <button 
+                    onClick={() => {
+                      setImage(null);
+                      setError(null);
+                    }}
+                    className="w-full bg-gray-100 text-gray-600 font-semibold py-3 rounded-xl hover:bg-gray-200 transition-colors"
+                  >
+                    Take New Photo
+                  </button>
+                </div>
+              </motion.div>
             )}
           </div>
         )}

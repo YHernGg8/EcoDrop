@@ -22,13 +22,13 @@ export default function UserProfile({ onBack, points, carbonOffset }: UserProfil
   return (
     <div className="flex flex-col h-full bg-gray-100">
       {/* Header & Profile Card */}
-      <div className="relative bg-gradient-to-br from-green-500 to-emerald-600 text-white p-6 pb-6 rounded-b-3xl shadow-lg">
+      <div className="relative bg-gradient-to-br from-green-500 to-emerald-600 text-white p-6 pb-8 rounded-b-3xl shadow-lg">
         <div className="absolute top-6 left-4">
           <button onClick={onBack} className="p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors">
             <ArrowLeft size={24} />
           </button>
         </div>
-        <div className="flex flex-col items-center pt-12">
+        <div className="flex flex-col items-center pt-10">
           <motion.div 
             initial={{ scale: 0.5, opacity: 0 }} 
             animate={{ scale: 1, opacity: 1 }}
@@ -57,7 +57,7 @@ export default function UserProfile({ onBack, points, carbonOffset }: UserProfil
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-6 space-y-6">
+      <div className="flex-1 overflow-y-auto p-6 space-y-5">
         {/* Stats Cards */}
         <motion.div 
           initial={{ y: 20, opacity: 0 }} 
@@ -65,11 +65,11 @@ export default function UserProfile({ onBack, points, carbonOffset }: UserProfil
           transition={{ delay: 0.4 }}
           className="grid grid-cols-2 gap-4"
         >
-          <div className="bg-white p-4 rounded-2xl shadow-lg border border-gray-100 text-center">
+          <div className="bg-white p-5 rounded-2xl shadow-lg border border-gray-100 text-center">
             <p className="text-3xl font-bold text-green-600">{points}</p>
             <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold">Points</p>
           </div>
-          <div className="bg-white p-4 rounded-2xl shadow-lg border border-gray-100 text-center">
+          <div className="bg-white p-5 rounded-2xl shadow-lg border border-gray-100 text-center">
             <p className="text-3xl font-bold text-blue-600">{carbonOffset}kg</p>
             <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold">CO2 Saved</p>
           </div>
