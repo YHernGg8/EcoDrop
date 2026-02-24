@@ -19,6 +19,8 @@ export default function EcoLocator({ onBack, pendingPoints, onVerify }: EcoLocat
   const [locationAccuracy, setLocationAccuracy] = useState<number | null>(null);
   const [isLocating, setIsLocating] = useState(false);
   const [bins, setBins] = useState<any[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterType, setFilterType] = useState<'all' | 'eco' | 'uco'>('all');
   
   const [verificationStep, setVerificationStep] = useState<VerificationStep>('idle');
   const [isVerifying, setIsVerifying] = useState(false);
@@ -117,20 +119,50 @@ export default function EcoLocator({ onBack, pendingPoints, onVerify }: EcoLocat
 
   const selectedBinData = bins.find(b => b.id === selectedBin);
 
+  const filteredBins = bins.filter(bin => {
+    const matchesSearch = bin.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesFilter = filterType === 'all' || bin.type === filterType;
+    return matchesSearch && matchesFilter;
+  });
+
   return (
     <div className="flex flex-col h-full bg-gray-50 relative overflow-hidden">
       {/* Header */}
-      <div className="absolute top-0 left-0 right-0 bg-white/90 backdrop-blur-md px-4 py-4 flex items-center gap-4 shadow-sm z-[1000]">
-        <button onClick={onBack} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-          <ArrowLeft size={24} className="text-gray-900" />
-        </button>
-        <h1 className="text-lg font-bold text-gray-900">Eco-Locator</h1>
+      <div className="absolute top-0 left-0 right-0 bg-white/90 backdrop-blur-md px-4 py-4 flex flex-col gap-3 shadow-sm z-[1000]">
+        <div className="flex items-center gap-4">
+          <button onClick={onBack} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+            <ArrowLeft size={24} className="text-gray-900" />
+          </button>
+          <h1 className="text-lg font-bold text-gray-900">Eco-Locator</h1>
+        </div>
+        
+        <div className="flex gap-2">
+          <div className="relative flex-1">
+            <input 
+              type="text" 
+              placeholder="Search locations..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-gray-100 border-none rounded-xl py-2.5 pl-10 pr-4 text-sm focus:ring-2 focus:ring-green-500 transition-all"
+            />
+            <Navigation size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+          </div>
+          <select 
+            value={filterType}
+            onChange={(e) => setFilterType(e.target.value as any)}
+            className="bg-gray-100 border-none rounded-xl px-3 py-2.5 text-sm font-medium focus:ring-2 focus:ring-green-500"
+          >
+            <option value="all">All Bins</option>
+            <option value="eco">Eco-Bins</option>
+            <option value="uco">UCO Bins</option>
+          </select>
+        </div>
       </div>
 
       {/* Map Area */}
       <div className="flex-1 relative bg-blue-50 z-0">
         <MapComponent 
-          bins={bins} 
+          bins={filteredBins} 
           userLocation={userLocation} 
           locationAccuracy={locationAccuracy}
           selectedBin={selectedBin} 
@@ -158,11 +190,11 @@ export default function EcoLocator({ onBack, pendingPoints, onVerify }: EcoLocat
             <div className="px-6 flex-1 overflow-y-auto custom-scrollbar">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-bold text-gray-900">Nearby Drop-off Points</h2>
-                <span className="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full">{bins.length} locations</span>
+                <span className="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full">{filteredBins.length} locations</span>
               </div>
               
               <div className="space-y-3 pb-4">
-                {bins.map((bin) => (
+                {filteredBins.map((bin) => (
                   <div 
                     key={bin.id} 
                     onClick={() => setSelectedBin(bin.id)}

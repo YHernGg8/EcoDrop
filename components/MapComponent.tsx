@@ -1,6 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, ZoomControl, useMap, Circle } from 'react-leaflet';
+import MarkerClusterGroup from 'react-leaflet-cluster';
+import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
 interface Bin {
@@ -22,51 +25,15 @@ interface MapComponentProps {
   setSelectedBin: (id: number) => void;
 }
 
-export default function MapComponent({ bins, userLocation, locationAccuracy, selectedBin, setSelectedBin }: MapComponentProps) {
-  const [MapLib, setMapLib] = useState<any>(null);
-
+function ChangeView({ center }: { center: [number, number] }) {
+  const map = useMap();
   useEffect(() => {
-    const loadMap = async () => {
-      try {
-        // Manually import libraries to ensure they only load on the client
-        const L = (await import('leaflet')).default;
-        const ReactLeaflet = await import('react-leaflet');
-        const MarkerClusterGroup = (await import('react-leaflet-cluster')).default;
+    map.setView(center, map.getZoom());
+  }, [center, map]);
+  return null;
+}
 
-        setMapLib({
-          L,
-          ...ReactLeaflet,
-          MarkerClusterGroup
-        });
-      } catch (error) {
-        console.error('Failed to load map libraries:', error);
-      }
-    };
-
-    loadMap();
-  }, []);
-
-  if (!MapLib) {
-    return (
-      <div className="w-full h-full flex items-center justify-center bg-blue-50">
-        <div className="animate-pulse flex flex-col items-center">
-          <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-2"></div>
-          <p className="text-blue-600 font-medium">Initializing Map...</p>
-        </div>
-      </div>
-    );
-  }
-
-  const { MapContainer, TileLayer, Marker, Popup, ZoomControl, useMap, MarkerClusterGroup, Circle, L } = MapLib;
-
-  function ChangeView({ center }: { center: [number, number] }) {
-    const map = useMap();
-    useEffect(() => {
-      map.setView(center, map.getZoom());
-    }, [center, map]);
-    return null;
-  }
-
+export default function MapComponent({ bins, userLocation, locationAccuracy, selectedBin, setSelectedBin }: MapComponentProps) {
   const createIcon = (fillLevel: number, type?: 'eco' | 'uco') => {
     const color = type === 'uco' ? '#f97316' : (fillLevel >= 90 ? '#ef4444' : fillLevel >= 70 ? '#eab308' : '#16a34a');
     
