@@ -16,9 +16,12 @@ export default function Dashboard({ points, carbonOffset, onNavigate }: Dashboar
           <h1 className="text-2xl font-bold text-gray-900">Hi, Alex 👋</h1>
           <p className="text-sm text-gray-500">Household Contributor</p>
         </div>
-        <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold">
+        <button 
+          onClick={() => onNavigate('profile')}
+          className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold hover:bg-green-200 transition-colors shadow-sm"
+        >
           A
-        </div>
+        </button>
       </header>
 
       {/* Impact Cards */}

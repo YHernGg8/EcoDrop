@@ -17,17 +17,40 @@ export default function EcoLocator({ onBack }: EcoLocatorProps) {
   const [isLocating, setIsLocating] = useState(false);
   const [bins, setBins] = useState<any[]>([]);
 
+  // Helper to calculate distance between two points in km
+  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+    const R = 6371; // Radius of the earth in km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = 
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  };
+
   // Function to generate mock bins around a location
   const generateNearbyBins = useCallback((lat: number, lng: number) => {
-    const newBins = [
-      { id: 1, name: 'Community Recycling Hub', distance: '0.4 km', status: 'Active', fillLevel: 45, lat: lat + 0.002, lng: lng + 0.003, type: 'eco' as const },
-      { id: 2, name: 'Green Point Center', distance: '0.9 km', status: 'Active', fillLevel: 80, lat: lat - 0.004, lng: lng + 0.001, type: 'eco' as const },
-      { id: 3, name: 'Eco-Collection Station', distance: '1.2 km', status: 'Full', fillLevel: 100, lat: lat + 0.005, lng: lng - 0.002, type: 'eco' as const },
-      { id: 4, name: 'Neighborhood Eco-Bin', distance: '1.8 km', status: 'Active', fillLevel: 20, lat: lat - 0.001, lng: lng - 0.005, type: 'eco' as const },
-      { id: 5, name: 'UCO Collection Point', distance: '0.6 km', status: 'Active', fillLevel: 30, lat: lat + 0.001, lng: lng - 0.001, type: 'uco' as const },
-      { id: 6, name: 'UCO Disposal Hub', distance: '2.1 km', status: 'Active', fillLevel: 60, lat: lat - 0.003, lng: lng + 0.004, type: 'uco' as const },
+    const rawBins = [
+      { id: 1, name: 'Community Recycling Hub', status: 'Active', fillLevel: 45, lat: lat + 0.002, lng: lng + 0.003, type: 'eco' as const },
+      { id: 2, name: 'Green Point Center', status: 'Active', fillLevel: 80, lat: lat - 0.004, lng: lng + 0.001, type: 'eco' as const },
+      { id: 3, name: 'Eco-Collection Station', status: 'Full', fillLevel: 100, lat: lat + 0.005, lng: lng - 0.002, type: 'eco' as const },
+      { id: 4, name: 'Neighborhood Eco-Bin', status: 'Active', fillLevel: 20, lat: lat - 0.001, lng: lng - 0.005, type: 'eco' as const },
+      { id: 5, name: 'UCO Collection Point', status: 'Active', fillLevel: 30, lat: lat + 0.001, lng: lng - 0.001, type: 'uco' as const },
+      { id: 6, name: 'UCO Disposal Hub', status: 'Active', fillLevel: 60, lat: lat - 0.003, lng: lng + 0.004, type: 'uco' as const },
     ];
-    setBins(newBins);
+
+    const processedBins = rawBins.map(bin => {
+      const dist = calculateDistance(lat, lng, bin.lat, bin.lng);
+      return {
+        ...bin,
+        distanceValue: dist,
+        distance: dist < 1 ? `${Math.round(dist * 1000)}m` : `${dist.toFixed(1)}km`
+      };
+    }).sort((a, b) => a.distanceValue - b.distanceValue);
+
+    setBins(processedBins);
   }, []);
 
   const handleLocateUser = useCallback(() => {

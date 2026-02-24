@@ -7,8 +7,9 @@ import SmartScan from '@/components/SmartScan';
 import EcoLocator from '@/components/EcoLocator';
 import B2BPortal from '@/components/B2BPortal';
 import BottomNav from '@/components/BottomNav';
+import UserProfile from '@/components/UserProfile';
 
-export type ViewState = 'dashboard' | 'scan' | 'locator' | 'rewards' | 'b2b';
+export type ViewState = 'dashboard' | 'scan' | 'locator' | 'rewards' | 'b2b' | 'profile';
 
 export default function App() {
   const [currentView, setCurrentView] = useState<ViewState>('dashboard');
@@ -102,6 +103,22 @@ export default function App() {
                 className="h-full"
               >
                 <B2BPortal />
+              </motion.div>
+            )}
+            {currentView === 'profile' && (
+              <motion.div
+                key="profile"
+                initial={{ opacity: 0, scale: 1.1 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: 0.2 }}
+                className="h-full"
+              >
+                <UserProfile 
+                  onBack={() => setCurrentView('dashboard')} 
+                  points={points} 
+                  carbonOffset={carbonOffset} 
+                />
               </motion.div>
             )}
           </AnimatePresence>

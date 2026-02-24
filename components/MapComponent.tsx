@@ -26,9 +26,9 @@ export default function MapComponent({ bins, userLocation, locationAccuracy, sel
   const [MapLib, setMapLib] = useState<any>(null);
 
   useEffect(() => {
-    // Load Leaflet and React-Leaflet only on the client
     const loadMap = async () => {
       try {
+        // Manually import libraries to ensure they only load on the client
         const L = (await import('leaflet')).default;
         const ReactLeaflet = await import('react-leaflet');
         const MarkerClusterGroup = (await import('react-leaflet-cluster')).default;
