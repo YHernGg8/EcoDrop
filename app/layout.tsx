@@ -1,14 +1,13 @@
-import type {Metadata} from 'next';
-import './globals.css'; // Global styles
+import type { Metadata } from 'next';
+import { AuthProvider } from '@/hooks/useAuth';
+import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'My Google AI Studio App',
-  description: 'My Google AI Studio App',
+  title: 'EcoDrop - Digitalizing Waste',
+  description: 'AI Smart Scan for Used Cooking Oil recycling',
 };
 
-import { AuthProvider } from '@/hooks/useAuth';
-
-export default function RootLayout({children}: {children: React.ReactNode}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body suppressHydrationWarning>

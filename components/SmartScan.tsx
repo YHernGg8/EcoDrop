@@ -184,13 +184,15 @@ export default function SmartScan({ onComplete, onBack }: SmartScanProps) {
               onChange={handleImageUpload}
             />
             
-            <button 
+            <motion.button 
               onClick={() => fileInputRef.current?.click()}
-              className="w-full bg-green-500 text-black font-bold text-lg py-4 rounded-full flex items-center justify-center gap-2 hover:bg-green-400 transition-colors"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="w-full bg-green-500 text-black font-bold text-lg py-4 rounded-full flex items-center justify-center gap-2 hover:bg-green-400 transition-all shadow-lg active:shadow-inner"
             >
               <Upload size={24} />
               Take Photo or Upload
-            </button>
+            </motion.button>
           </div>
         ) : (
           <div className="w-full h-full flex flex-col">
@@ -267,11 +269,13 @@ export default function SmartScan({ onComplete, onBack }: SmartScanProps) {
             <AnimatePresence>
               {result && !isAnalyzing && (
                 <motion.div 
-                  initial={{ opacity: 0, y: 50 }}
+                  initial={{ opacity: 0, y: 100 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="bg-white text-gray-900 rounded-3xl p-6 shadow-2xl"
+                  className="bg-white text-gray-900 rounded-t-3xl p-6 pb-24 shadow-2xl absolute bottom-0 left-0 right-0 z-20 max-h-[85vh] overflow-y-auto custom-scrollbar"
                 >
-                  <div className="flex justify-between items-start mb-4">
+                  <div className="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-6 shrink-0" />
+                  
+                  <div className="flex justify-between items-start mb-6">
                     <div>
                       <h3 className="text-xl font-bold">Analysis Complete</h3>
                       <p className="text-sm text-gray-500">EcoDrop Vision AI</p>
@@ -370,19 +374,26 @@ export default function SmartScan({ onComplete, onBack }: SmartScanProps) {
                   </div>
 
                   <div className="flex items-center gap-3 mt-6">
-                    <button 
+                    <motion.button 
                       onClick={handleScanAgain}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.95 }}
                       className="w-full bg-gray-200 text-gray-800 font-bold py-4 rounded-xl hover:bg-gray-300 transition-colors"
                     >
                       Scan Again
-                    </button>
-                    <button 
+                    </motion.button>
+                    <motion.button 
                       onClick={handleClaimPoints}
-                      className="w-full bg-gray-900 text-white font-bold py-4 rounded-xl hover:bg-gray-800 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-gray-200"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="w-full bg-gray-900 text-white font-bold py-4 rounded-xl hover:bg-gray-800 transition-colors flex flex-col items-center justify-center shadow-lg shadow-gray-200"
                     >
-                      <span>Claim {result.grade === 'A' ? 50 : result.grade === 'B' ? 30 : 10} Points</span>
-                      <ArrowLeft size={18} className="rotate-180" />
-                    </button>
+                      <div className="flex items-center gap-2">
+                        <span>Earn {result.grade === 'A' ? 50 : result.grade === 'B' ? 30 : 10} Points</span>
+                        <ArrowLeft size={18} className="rotate-180" />
+                      </div>
+                      <span className="text-[10px] font-medium opacity-60 uppercase tracking-wider">Pending Verification</span>
+                    </motion.button>
                   </div>
                 </motion.div>
               )}

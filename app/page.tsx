@@ -14,14 +14,24 @@ import { useAuth } from '@/hooks/useAuth';
 export type ViewState = 'dashboard' | 'scan' | 'locator' | 'rewards' | 'b2b' | 'profile';
 
 export default function App() {
-  const { user, loading } = useAuth();
+  const auth = useAuth();
+  const user = auth?.user;
+  const loading = auth?.loading;
+  
   const [currentView, setCurrentView] = useState<ViewState>('dashboard');
-  const [points, setPoints] = useState(1250);
+  const [verifiedPoints, setVerifiedPoints] = useState(1250);
+  const [pendingPoints, setPendingPoints] = useState(0);
   const [carbonOffset, setCarbonOffset] = useState(12.4);
 
   const handleScanComplete = (earnedPoints: number) => {
-    setPoints(prev => prev + earnedPoints);
-    setCarbonOffset(prev => prev + (earnedPoints * 0.01)); // Rough estimate
+    setPendingPoints(prev => prev + earnedPoints);
+  };
+
+  const handleVerifyComplete = (pointsToVerify: number) => {
+    setVerifiedPoints(prev => prev + pointsToVerify);
+    setPendingPoints(0);
+    setCarbonOffset(prev => prev + (pointsToVerify * 0.01));
+    setCurrentView('dashboard');
   };
 
   if (loading) {
@@ -54,7 +64,8 @@ export default function App() {
                 className="h-full"
               >
                 <Dashboard 
-                  points={points} 
+                  verifiedPoints={verifiedPoints} 
+                  pendingPoints={pendingPoints}
                   carbonOffset={carbonOffset} 
                   onNavigate={setCurrentView} 
                 />
@@ -81,7 +92,11 @@ export default function App() {
                 transition={{ duration: 0.2 }}
                 className="h-full"
               >
-                <EcoLocator onBack={() => setCurrentView('dashboard')} />
+                <EcoLocator 
+                  onBack={() => setCurrentView('dashboard')} 
+                  pendingPoints={pendingPoints}
+                  onVerify={handleVerifyComplete}
+                />
               </motion.div>
             )}
             {currentView === 'rewards' && (
@@ -95,7 +110,7 @@ export default function App() {
               >
                 <div>
                   <h2 className="text-2xl font-bold text-green-700 mb-2">Green Rewards</h2>
-                  <p className="text-gray-500 mb-6">Redeem your {Math.floor(points)} points for exclusive vouchers.</p>
+                  <p className="text-gray-500 mb-6">Redeem your {Math.floor(verifiedPoints)} points for exclusive vouchers.</p>
                   <div className="p-6 bg-green-50 rounded-2xl border border-green-100">
                     <p className="text-sm text-green-800">Rewards catalog coming soon to the prototype!</p>
                   </div>
@@ -131,7 +146,7 @@ export default function App() {
               >
                 <UserProfile 
                   onBack={() => setCurrentView('dashboard')} 
-                  points={points} 
+                  points={verifiedPoints} 
                   carbonOffset={carbonOffset} 
                 />
               </motion.div>

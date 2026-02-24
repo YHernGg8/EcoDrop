@@ -4,7 +4,8 @@ import { Droplet, MapPin, Leaf, ChevronRight, ArrowRight } from 'lucide-react';
 import { motion, useMotionValue, useSpring, useTransform, animate } from 'motion/react';
 
 interface DashboardProps {
-  points: number;
+  verifiedPoints: number;
+  pendingPoints: number;
   carbonOffset: number;
   onNavigate: (view: ViewState) => void;
 }
@@ -24,7 +25,7 @@ function Counter({ value, decimals = 0 }: { value: number; decimals?: number }) 
   return <motion.span>{rounded}</motion.span>;
 }
 
-export default function Dashboard({ points, carbonOffset, onNavigate }: DashboardProps) {
+export default function Dashboard({ verifiedPoints, pendingPoints, carbonOffset, onNavigate }: DashboardProps) {
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
@@ -46,15 +47,26 @@ export default function Dashboard({ points, carbonOffset, onNavigate }: Dashboar
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-br from-green-500 to-green-600 rounded-3xl p-5 text-white shadow-lg shadow-green-200"
+          className="bg-gradient-to-br from-green-500 to-green-600 rounded-3xl p-5 text-white shadow-lg shadow-green-200 relative overflow-hidden"
         >
           <div className="flex items-center gap-2 mb-2 opacity-90">
             <Leaf size={18} />
-            <span className="text-xs font-medium uppercase tracking-wider">Green Points</span>
+            <span className="text-xs font-medium uppercase tracking-wider">Verified Points</span>
           </div>
           <div className="text-3xl font-bold">
-            <Counter value={points} />
+            <Counter value={verifiedPoints} />
           </div>
+          
+          {pendingPoints > 0 && (
+            <motion.div 
+              initial={{ x: 50, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              className="absolute top-4 right-4 bg-yellow-400 text-gray-900 text-[10px] font-black px-2 py-1 rounded-full shadow-sm flex items-center gap-1"
+            >
+              <div className="w-1.5 h-1.5 bg-gray-900 rounded-full animate-pulse" />
+              {pendingPoints} PENDING
+            </motion.div>
+          )}
         </motion.div>
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
@@ -72,6 +84,31 @@ export default function Dashboard({ points, carbonOffset, onNavigate }: Dashboar
           </div>
         </motion.div>
       </div>
+
+      {/* Pending Points Alert */}
+      {pendingPoints > 0 && (
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="bg-yellow-50 border border-yellow-100 rounded-2xl p-4 flex items-center justify-between"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-700">
+              <MapPin size={20} />
+            </div>
+            <div>
+              <div className="text-sm font-bold text-yellow-800">Unlock {pendingPoints} Points</div>
+              <div className="text-xs text-yellow-700">Drop off your oil at a bin to verify.</div>
+            </div>
+          </div>
+          <button 
+            onClick={() => onNavigate('locator')}
+            className="bg-yellow-400 text-gray-900 text-xs font-bold px-4 py-2 rounded-xl shadow-sm active:scale-95 transition-transform"
+          >
+            Go to Map
+          </button>
+        </motion.div>
+      )}
 
       {/* Quick Actions */}
       <section>
