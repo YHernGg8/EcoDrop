@@ -275,124 +275,137 @@ export default function SmartScan({ onComplete, onBack }: SmartScanProps) {
                 >
                   <div className="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-6 shrink-0" />
                   
-                  <div className="flex justify-between items-start mb-6">
+                  <div className="flex justify-between items-start mb-8">
                     <div>
-                      <h3 className="text-xl font-bold">Analysis Complete</h3>
-                      <p className="text-sm text-gray-500">EcoDrop Vision AI</p>
+                      <h3 className="text-2xl font-black tracking-tight">Analysis Report</h3>
+                      <p className="text-sm text-gray-500 font-medium">EcoDrop Vision Engine v2.5</p>
                     </div>
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl font-bold ${
-                      result.grade === 'A' ? 'bg-green-100 text-green-600' : 
-                      result.grade === 'B' ? 'bg-yellow-100 text-yellow-600' : 
-                      'bg-red-100 text-red-600'
-                    }`}>
-                      {result.grade}
+                    <div className="flex flex-col items-end">
+                      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-3xl font-black shadow-lg ${
+                        result.grade === 'A' ? 'bg-green-500 text-white shadow-green-200' : 
+                        result.grade === 'B' ? 'bg-yellow-500 text-white shadow-yellow-200' : 
+                        'bg-red-500 text-white shadow-red-200'
+                      }`}>
+                        {result.grade}
+                      </div>
+                      <span className="text-[10px] font-bold text-gray-400 mt-2 uppercase tracking-widest">Quality Grade</span>
                     </div>
                   </div>
 
-                  <div className="space-y-4 mb-6">
-                    {/* Grade Banner */}
-                    <div className={`flex items-center gap-4 p-4 rounded-2xl border ${
-                      result.grade === 'A' ? 'bg-green-50 border-green-200' : 
-                      result.grade === 'B' ? 'bg-yellow-50 border-yellow-200' : 
-                      'bg-red-50 border-red-200'
+                  <div className="grid grid-cols-2 gap-4 mb-8">
+                    {/* Primary Grade Card */}
+                    <div className={`col-span-2 p-5 rounded-3xl border-2 flex items-start gap-4 ${
+                      result.grade === 'A' ? 'bg-green-50 border-green-100' : 
+                      result.grade === 'B' ? 'bg-yellow-50 border-yellow-100' : 
+                      'bg-red-50 border-red-100'
                     }`}>
-                      <div className={`w-14 h-14 rounded-full flex items-center justify-center text-3xl font-black shrink-0 ${
+                      <div className={`p-3 rounded-2xl ${
                         result.grade === 'A' ? 'bg-green-100 text-green-600' : 
                         result.grade === 'B' ? 'bg-yellow-100 text-yellow-600' : 
                         'bg-red-100 text-red-600'
                       }`}>
-                        {result.grade}
+                        <CheckCircle2 size={24} />
                       </div>
                       <div>
-                        <h4 className={`font-bold text-lg ${
-                          result.grade === 'A' ? 'text-green-800' : 
-                          result.grade === 'B' ? 'text-yellow-800' : 
-                          'text-red-800'
-                        }`}>
-                          {result.grade === 'A' ? 'Premium UCO' : result.grade === 'B' ? 'Standard UCO' : 'Low-grade UCO'}
+                        <h4 className="font-bold text-gray-900">
+                          {result.grade === 'A' ? 'Premium Grade' : result.grade === 'B' ? 'Standard Grade' : 'Industrial Grade'}
                         </h4>
-                        <p className={`text-sm leading-tight mt-1 ${
-                          result.grade === 'A' ? 'text-green-700' : 
-                          result.grade === 'B' ? 'text-yellow-700' : 
-                          'text-red-700'
-                        }`}>
+                        <p className="text-sm text-gray-600 leading-snug mt-1">
                           {result.reasoning}
                         </p>
                       </div>
                     </div>
 
-                    {/* Metrics Grid */}
-                    <div className="grid grid-cols-3 gap-3">
-                      <div className="bg-gray-50 border border-gray-100 p-4 rounded-2xl flex flex-col items-center justify-center text-center">
-                        <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Purity</div>
-                        <div className="relative w-16 h-16 flex items-center justify-center">
-                          <svg className="w-full h-full transform -rotate-90 absolute inset-0">
-                            <circle cx="32" cy="32" r="28" stroke="currentColor" strokeWidth="6" fill="transparent" className="text-gray-200" />
-                            <circle 
-                              cx="32" cy="32" r="28" 
-                              stroke="currentColor" 
-                              strokeWidth="6" 
-                              fill="transparent" 
-                              strokeDasharray="175.9" 
-                              strokeDashoffset={175.9 - (175.9 * result.purityPercentage) / 100}
-                              className={result.purityPercentage >= 80 ? 'text-green-500' : result.purityPercentage >= 50 ? 'text-yellow-500' : 'text-red-500'} 
-                            />
-                          </svg>
-                          <span className="font-bold text-lg text-gray-900 relative z-10">{result.purityPercentage}%</span>
-                        </div>
-                      </div>
-                      
-                      <div className="bg-gray-50 border border-gray-100 p-4 rounded-2xl flex flex-col items-center justify-center text-center">
-                        <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Oil Type</div>
-                        <div className="w-16 h-16 rounded-full flex items-center justify-center bg-gray-100 text-gray-800">
-                          <span className="font-bold text-sm text-center leading-tight">{result.oilType}</span>
-                        </div>
-                      </div>
-
-                      <div className="bg-gray-50 border border-gray-100 p-4 rounded-2xl flex flex-col items-center justify-center text-center">
-                        <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Water</div>
-                        <div className={`w-16 h-16 rounded-full flex items-center justify-center border-4 ${
-                          result.waterContent === 'Low' ? 'border-green-100 bg-green-50 text-green-600' :
-                          result.waterContent === 'Medium' ? 'border-yellow-100 bg-yellow-50 text-yellow-600' :
-                          'border-red-100 bg-red-50 text-red-600'
-                        }`}>
-                          <span className="font-bold text-sm uppercase tracking-wide">{result.waterContent}</span>
+                    {/* Purity Bento Item */}
+                    <div className="bg-gray-50 p-5 rounded-3xl border border-gray-100 flex flex-col justify-between">
+                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4">Purity Level</span>
+                      <div className="flex items-end justify-between">
+                        <span className="text-3xl font-black text-gray-900">{result.purityPercentage}%</span>
+                        <div className="w-10 h-10 rounded-full border-2 border-gray-200 flex items-center justify-center">
+                          <div 
+                            className="w-6 h-6 rounded-full bg-green-500 transition-all duration-1000"
+                            style={{ opacity: result.purityPercentage / 100 }}
+                          />
                         </div>
                       </div>
                     </div>
-                    
-                    {/* Warnings */}
+
+                    {/* Water Content Bento Item */}
+                    <div className="bg-gray-50 p-5 rounded-3xl border border-gray-100 flex flex-col justify-between">
+                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4">Water Content</span>
+                      <div className="flex items-center gap-3">
+                        <div className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${
+                          result.waterContent === 'Low' ? 'bg-green-100 text-green-700' :
+                          result.waterContent === 'Medium' ? 'bg-yellow-100 text-yellow-700' :
+                          'bg-red-100 text-red-700'
+                        }`}>
+                          {result.waterContent}
+                        </div>
+                        <span className="text-[10px] text-gray-400 font-medium">Detected</span>
+                      </div>
+                    </div>
+
+                    {/* Oil Type Bento Item */}
+                    <div className="bg-gray-900 p-5 rounded-3xl text-white flex flex-col justify-between">
+                      <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-4">Source Type</span>
+                      <span className="text-lg font-bold">{result.oilType}</span>
+                    </div>
+
+                    {/* Impact Bento Item */}
+                    <div className="bg-green-600 p-5 rounded-3xl text-white flex flex-col justify-between">
+                      <span className="text-[10px] font-bold text-green-200 uppercase tracking-widest mb-4">Eco Impact</span>
+                      <div>
+                        <span className="text-xl font-black">~{result.grade === 'A' ? '2.4' : result.grade === 'B' ? '1.8' : '0.9'}kg</span>
+                        <p className="text-[10px] text-green-100 font-medium">CO2 Offset Potential</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Warnings & Advice */}
+                  <div className="space-y-3 mb-8">
                     {result.debrisDetected && (
                       <div className="flex items-start gap-3 bg-orange-50 border border-orange-100 p-4 rounded-2xl">
                         <AlertTriangle size={20} className="text-orange-500 mt-0.5 shrink-0" />
                         <div>
-                          <h5 className="font-semibold text-orange-800 text-sm">Debris Detected</h5>
-                          <p className="text-xs text-orange-700 mt-1 leading-relaxed">Please filter your oil next time to achieve a higher grade and earn more points.</p>
+                          <h5 className="font-bold text-orange-900 text-sm">Action Required: Filtering</h5>
+                          <p className="text-xs text-orange-700 mt-1 leading-relaxed">Significant food particles detected. Please use a fine mesh strainer before your next drop-off to maintain Grade A quality.</p>
                         </div>
                       </div>
                     )}
+                    
+                    <div className="bg-blue-50 border border-blue-100 p-4 rounded-2xl flex items-start gap-3">
+                      <CheckCircle2 size={20} className="text-blue-500 mt-0.5 shrink-0" />
+                      <div>
+                        <h5 className="font-bold text-blue-900 text-sm">Recycling Potential</h5>
+                        <p className="text-xs text-blue-700 mt-1 leading-relaxed">
+                          {result.grade === 'A' ? 'Highly suitable for premium biodiesel production.' : 
+                           result.grade === 'B' ? 'Perfect for industrial-grade soap and detergent base.' : 
+                           'Suitable for technical lubricants and heavy-duty industrial use.'}
+                        </p>
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="flex items-center gap-3 mt-6">
+                  <div className="flex items-center gap-3">
                     <motion.button 
                       onClick={handleScanAgain}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.95 }}
-                      className="w-full bg-gray-200 text-gray-800 font-bold py-4 rounded-xl hover:bg-gray-300 transition-colors"
+                      className="flex-1 bg-gray-100 text-gray-900 font-bold py-4 rounded-2xl hover:bg-gray-200 transition-colors"
                     >
-                      Scan Again
+                      Scan New
                     </motion.button>
                     <motion.button 
                       onClick={handleClaimPoints}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.95 }}
-                      className="w-full bg-gray-900 text-white font-bold py-4 rounded-xl hover:bg-gray-800 transition-colors flex flex-col items-center justify-center shadow-lg shadow-gray-200"
+                      className="flex-[2] bg-green-600 text-white font-bold py-4 rounded-2xl hover:bg-green-700 transition-colors flex flex-col items-center justify-center shadow-xl shadow-green-100"
                     >
                       <div className="flex items-center gap-2">
-                        <span>Earn {result.grade === 'A' ? 50 : result.grade === 'B' ? 30 : 10} Points</span>
+                        <span>Claim {result.grade === 'A' ? 50 : result.grade === 'B' ? 30 : 10} Points</span>
                         <ArrowLeft size={18} className="rotate-180" />
                       </div>
-                      <span className="text-[10px] font-medium opacity-60 uppercase tracking-wider">Pending Verification</span>
+                      <span className="text-[10px] font-bold text-green-200 uppercase tracking-widest mt-0.5">Verified Quality</span>
                     </motion.button>
                   </div>
                 </motion.div>
@@ -402,7 +415,15 @@ export default function SmartScan({ onComplete, onBack }: SmartScanProps) {
             {error && !isAnalyzing && (
               <motion.div 
                 initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
+                animate={{ 
+                  opacity: 1, 
+                  scale: 1,
+                  x: [0, -10, 10, -10, 10, 0]
+                }}
+                transition={{
+                  duration: 0.5,
+                  x: { delay: 0.1 }
+                }}
                 className="bg-white text-gray-900 rounded-3xl p-6 shadow-2xl border-t-4 border-red-500"
               >
                 <div className="flex items-center gap-3 mb-4">

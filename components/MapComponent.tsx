@@ -34,6 +34,12 @@ function ChangeView({ center }: { center: [number, number] }) {
 }
 
 export default function MapComponent({ bins, userLocation, locationAccuracy, selectedBin, setSelectedBin }: MapComponentProps) {
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   const createIcon = (fillLevel: number, type?: 'eco' | 'uco') => {
     const color = type === 'uco' ? '#f97316' : (fillLevel >= 90 ? '#ef4444' : fillLevel >= 70 ? '#eab308' : '#16a34a');
     
@@ -55,6 +61,10 @@ export default function MapComponent({ bins, userLocation, locationAccuracy, sel
   };
 
   const userIcon = getUserIcon();
+
+  if (!isClient) {
+    return null; // Or a loading spinner
+  }
 
   return (
     <MapContainer 

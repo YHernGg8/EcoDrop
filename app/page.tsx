@@ -2,16 +2,19 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { ArrowLeft } from 'lucide-react';
 import Dashboard from '@/components/Dashboard';
 import SmartScan from '@/components/SmartScan';
 import EcoLocator from '@/components/EcoLocator';
 import B2BPortal from '@/components/B2BPortal';
+import EducationSection from '@/components/EducationSection';
+import RewardsShop from '@/components/RewardsShop';
 import BottomNav from '@/components/BottomNav';
 import UserProfile from '@/components/UserProfile';
 import AuthPage from '@/components/AuthPage';
 import { useAuth } from '@/hooks/useAuth';
 
-export type ViewState = 'dashboard' | 'scan' | 'locator' | 'rewards' | 'b2b' | 'profile';
+export type ViewState = 'dashboard' | 'scan' | 'locator' | 'rewards' | 'b2b' | 'profile' | 'education';
 
 export default function App() {
   const auth = useAuth();
@@ -102,25 +105,13 @@ export default function App() {
             {currentView === 'rewards' && (
               <motion.div
                 key="rewards"
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.2 }}
-                className="h-full flex items-center justify-center p-6 text-center"
+                className="h-full"
               >
-                <div>
-                  <h2 className="text-2xl font-bold text-green-700 mb-2">Green Rewards</h2>
-                  <p className="text-gray-500 mb-6">Redeem your {Math.floor(verifiedPoints)} points for exclusive vouchers.</p>
-                  <div className="p-6 bg-green-50 rounded-2xl border border-green-100">
-                    <p className="text-sm text-green-800">Rewards catalog coming soon to the prototype!</p>
-                  </div>
-                  <button 
-                    onClick={() => setCurrentView('dashboard')}
-                    className="mt-8 text-green-600 font-medium"
-                  >
-                    Back to Dashboard
-                  </button>
-                </div>
+                <RewardsShop points={verifiedPoints} onBack={() => setCurrentView('dashboard')} />
               </motion.div>
             )}
             {currentView === 'b2b' && (
@@ -153,6 +144,27 @@ export default function App() {
             )}
           </AnimatePresence>
         </main>
+
+        <AnimatePresence>
+          {currentView === 'education' && (
+            <motion.div
+              key="education-modal"
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+              className="absolute inset-0 z-[5000] bg-white"
+            >
+              <EducationSection />
+              <button 
+                onClick={() => setCurrentView('dashboard')}
+                className="absolute top-6 left-6 bg-black/50 text-white rounded-full p-2 hover:bg-black/70 transition-colors"
+              >
+                <ArrowLeft size={20} />
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Bottom Navigation */}
         <BottomNav currentView={currentView} onViewChange={setCurrentView} />

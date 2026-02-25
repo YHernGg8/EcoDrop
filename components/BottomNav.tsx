@@ -12,8 +12,8 @@ export default function BottomNav({ currentView, onViewChange }: BottomNavProps)
     { id: 'dashboard', icon: Home, label: 'Home' },
     { id: 'locator', icon: Map, label: 'Map' },
     { id: 'scan', icon: ScanLine, label: 'Scan' },
-    { id: 'b2b', icon: Building2, label: 'B2B' },
     { id: 'rewards', icon: Gift, label: 'Rewards' },
+    { id: 'b2b', icon: Building2, label: 'B2B' },
   ] as const;
 
   return (

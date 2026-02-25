@@ -194,44 +194,66 @@ export default function EcoLocator({ onBack, pendingPoints, onVerify }: EcoLocat
               </div>
               
               <div className="space-y-3 pb-4">
-                {filteredBins.map((bin) => (
-                  <div 
-                    key={bin.id} 
-                    onClick={() => setSelectedBin(bin.id)}
-                    className={`border rounded-2xl p-4 flex items-center justify-between transition-all cursor-pointer ${
-                      selectedBin === bin.id ? 'border-green-500 bg-green-50 ring-2 ring-green-100' : 'border-gray-100 hover:border-green-200'
-                    }`}
-                  >
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-gray-900">{bin.name}</h3>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="text-sm text-gray-500">{bin.distance}</span>
-                        <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
-                        <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-                          bin.fillLevel >= 90 ? 'bg-red-100 text-red-700' :
-                          bin.fillLevel >= 70 ? 'bg-yellow-100 text-yellow-700' :
-                          'bg-green-100 text-green-700'
-                        }`}>
-                          {bin.fillLevel}% Full
-                        </span>
+                {filteredBins.length > 0 ? (
+                  filteredBins.map((bin) => (
+                    <div 
+                      key={bin.id} 
+                      onClick={() => setSelectedBin(bin.id)}
+                      className={`border rounded-2xl p-4 flex items-center justify-between transition-all cursor-pointer ${
+                        selectedBin === bin.id ? 'border-green-500 bg-green-50 ring-2 ring-green-100' : 'border-gray-100 hover:border-green-200'
+                      }`}
+                    >
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-gray-900">{bin.name}</h3>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-sm text-gray-500">{bin.distance}</span>
+                          <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
+                          <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+                            bin.fillLevel >= 90 ? 'bg-red-100 text-red-700' :
+                            bin.fillLevel >= 70 ? 'bg-yellow-100 text-yellow-700' :
+                            'bg-green-100 text-green-700'
+                          }`}>
+                            {bin.fillLevel}% Full
+                          </span>
+                        </div>
                       </div>
+                      
+                      {selectedBin === bin.id && pendingPoints > 0 ? (
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); startVerification(); }}
+                          className="bg-green-600 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-md active:scale-95 transition-transform flex items-center gap-2"
+                        >
+                          <ShieldCheck size={16} />
+                          Verify Drop-off
+                        </button>
+                      ) : (
+                        <div className="w-10 h-10 rounded-full bg-green-100 text-green-700 flex items-center justify-center">
+                          <Navigation size={18} />
+                        </div>
+                      )}
                     </div>
-                    
-                    {selectedBin === bin.id && pendingPoints > 0 ? (
-                      <button 
-                        onClick={(e) => { e.stopPropagation(); startVerification(); }}
-                        className="bg-green-600 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-md active:scale-95 transition-transform flex items-center gap-2"
-                      >
-                        <ShieldCheck size={16} />
-                        Verify Drop-off
-                      </button>
-                    ) : (
-                      <div className="w-10 h-10 rounded-full bg-green-100 text-green-700 flex items-center justify-center">
-                        <Navigation size={18} />
-                      </div>
-                    )}
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex flex-col items-center justify-center py-12 text-center"
+                  >
+                    <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+                      <AlertCircle size={32} className="text-gray-300" />
+                    </div>
+                    <h3 className="text-gray-900 font-bold">No results found</h3>
+                    <p className="text-gray-500 text-sm max-w-[200px] mt-1">
+                      We couldn&apos;t find any bins matching &quot;{searchQuery}&quot;
+                    </p>
+                    <button 
+                      onClick={() => { setSearchQuery(''); setFilterType('all'); }}
+                      className="mt-4 text-green-600 font-bold text-sm hover:underline"
+                    >
+                      Clear all filters
+                    </button>
+                  </motion.div>
+                )}
               </div>
             </div>
           </motion.div>

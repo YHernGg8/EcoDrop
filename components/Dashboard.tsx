@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { ViewState } from '@/app/page';
-import { Droplet, MapPin, Leaf, ChevronRight, ArrowRight } from 'lucide-react';
+import { Droplet, MapPin, Leaf, ChevronRight, ArrowRight, BookOpen } from 'lucide-react';
 import { motion, useMotionValue, useSpring, useTransform, animate } from 'motion/react';
 
 interface DashboardProps {
@@ -84,6 +84,23 @@ export default function Dashboard({ verifiedPoints, pendingPoints, carbonOffset,
           </div>
         </motion.div>
       </div>
+
+      {/* Learn & Impact Banner */}
+      <motion.button
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        onClick={() => onNavigate('education')}
+        className="w-full bg-green-50 border border-green-100 rounded-3xl p-5 flex items-center gap-4 text-left hover:bg-green-100 transition-colors group"
+      >
+        <div className="w-14 h-14 rounded-2xl bg-green-600 flex items-center justify-center text-white shadow-lg shadow-green-200 shrink-0 group-hover:scale-110 transition-transform">
+          <BookOpen size={28} />
+        </div>
+        <div>
+          <h3 className="font-bold text-green-900">Learn & Impact</h3>
+          <p className="text-xs text-green-700 leading-snug mt-1">Discover why your recycling matters and how to dispose of oil properly.</p>
+        </div>
+        <ChevronRight size={20} className="text-green-400 ml-auto" />
+      </motion.button>
 
       {/* Pending Points Alert */}
       {pendingPoints > 0 && (
