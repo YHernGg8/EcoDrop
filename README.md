@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="public/logo.png" alt="EcoDrop Logo" width="300"/>
+  <img src="https://github.com/user-attachments/assets/5c36a4a3-2971-46a7-9abe-9a8ca2feb152" alt="EcoDrop Logo" width="300" />
 
   # 💧 EcoDrop
   **Digitalizing Waste For A Greener Tomorrow**
