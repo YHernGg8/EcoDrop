@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
 import { Ticket, Fuel, ShoppingBag, ArrowRight } from 'lucide-react';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface RewardsShopProps {
   points: number;
@@ -10,12 +11,13 @@ interface RewardsShopProps {
 }
 
 export default function RewardsShop({ points, onBack }: RewardsShopProps) {
+  const { t } = useLanguage();
   const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({});
 
   const vouchers = [
     {
       partner: 'Petronas',
-      title: 'RM5 Fuel Voucher',
+      title: `RM5 ${t.nav.scan === 'Imbas' ? 'Baucar Bahan Api' : 'Fuel Voucher'}`,
       points: 500,
       icon: Fuel,
       logo: 'https://logo.clearbit.com/petronas.com',
@@ -23,7 +25,7 @@ export default function RewardsShop({ points, onBack }: RewardsShopProps) {
     },
     {
       partner: 'Shell',
-      title: 'RM5 Fuel Voucher',
+      title: `RM5 ${t.nav.scan === 'Imbas' ? 'Baucar Bahan Api' : 'Fuel Voucher'}`,
       points: 500,
       icon: Fuel,
       logo: 'https://logo.clearbit.com/shell.com',
@@ -31,7 +33,7 @@ export default function RewardsShop({ points, onBack }: RewardsShopProps) {
     },
     {
       partner: 'Tesco',
-      title: 'RM10 Grocery Voucher',
+      title: `RM10 ${t.nav.scan === 'Imbas' ? 'Baucar Barangan Runcit' : 'Grocery Voucher'}`,
       points: 1000,
       icon: ShoppingBag,
       logo: 'https://logo.clearbit.com/tesco.com',
@@ -39,7 +41,7 @@ export default function RewardsShop({ points, onBack }: RewardsShopProps) {
     },
     {
       partner: 'AEON',
-      title: 'RM10 Shopping Voucher',
+      title: `RM10 ${t.nav.scan === 'Imbas' ? 'Baucar Membeli-belah' : 'Shopping Voucher'}`,
       points: 1000,
       icon: ShoppingBag,
       logo: 'https://logo.clearbit.com/aeon.info',
@@ -53,12 +55,12 @@ export default function RewardsShop({ points, onBack }: RewardsShopProps) {
       <div className="bg-white p-6 pt-12 shadow-sm sticky top-0 z-10">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-black tracking-tight">Rewards Shop</h1>
-            <p className="text-sm text-gray-500">Redeem your green points</p>
+            <h1 className="text-2xl font-black tracking-tight">{t.rewards.title}</h1>
+            <p className="text-sm text-gray-500">{t.rewards.subtitle}</p>
           </div>
           <div className="text-right">
             <div className="text-2xl font-black text-green-600">{Math.floor(points)}</div>
-            <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Your Points</span>
+            <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">{t.rewards.yourPoints}</span>
           </div>
         </div>
       </div>
@@ -105,8 +107,8 @@ export default function RewardsShop({ points, onBack }: RewardsShopProps) {
                     : 'bg-black/20 text-white/50 cursor-not-allowed'
                 }`}
               >
-                <span className="font-bold text-sm">{voucher.points} pts</span>
-                <span className="text-[9px] font-semibold uppercase tracking-wider">{canRedeem ? 'Redeem' : 'Needed'}</span>
+                <span className="font-bold text-sm">{voucher.points} {t.common.points.toLowerCase()}</span>
+                <span className="text-[9px] font-semibold uppercase tracking-wider">{canRedeem ? t.common.redeem : t.common.needed}</span>
               </button>
             </motion.div>
           );

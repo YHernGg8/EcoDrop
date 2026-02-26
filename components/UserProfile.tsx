@@ -1,9 +1,10 @@
 'use client';
 
 import { motion } from 'motion/react';
-import { ArrowLeft, User, Settings, Award, History, LogOut, ChevronRight, Mail, Phone, MapPin } from 'lucide-react';
+import { ArrowLeft, User, Settings, Award, History, LogOut, ChevronRight, Mail, Phone, MapPin, Languages } from 'lucide-react';
 import { auth } from '@/lib/firebase';
 import { signOut } from 'firebase/auth';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface UserProfileProps {
   onBack: () => void;
@@ -12,11 +13,13 @@ interface UserProfileProps {
 }
 
 export default function UserProfile({ onBack, points, carbonOffset }: UserProfileProps) {
+  const { t, language, setLanguage } = useLanguage();
+
   const menuItems = [
-    { icon: <Award size={20} className="text-yellow-600" />, label: 'My Achievements', badge: '12' },
-    { icon: <History size={20} className="text-blue-600" />, label: 'Recycling History' },
-    { icon: <Settings size={20} className="text-gray-600" />, label: 'Account Settings' },
-    { icon: <LogOut size={20} className="text-red-600" />, label: 'Sign Out', action: () => signOut(auth) },
+    { icon: <Award size={20} className="text-yellow-600" />, label: language === 'en' ? 'My Achievements' : 'Pencapaian Saya', badge: '12' },
+    { icon: <History size={20} className="text-blue-600" />, label: t.profile.history },
+    { icon: <Settings size={20} className="text-gray-600" />, label: t.profile.settings },
+    { icon: <LogOut size={20} className="text-red-600" />, label: t.profile.logout, action: () => signOut(auth) },
   ];
 
   return (
@@ -52,7 +55,7 @@ export default function UserProfile({ onBack, points, carbonOffset }: UserProfil
             transition={{ delay: 0.3 }}
             className="text-green-100 text-sm opacity-90"
           >
-            Eco-Warrior since Jan 2024
+            {language === 'en' ? 'Eco-Warrior since Jan 2024' : 'Pejuang Eco sejak Jan 2024'}
           </motion.p>
         </div>
       </div>
@@ -67,11 +70,40 @@ export default function UserProfile({ onBack, points, carbonOffset }: UserProfil
         >
           <div className="bg-white p-5 rounded-2xl shadow-lg border border-gray-100 text-center">
             <p className="text-3xl font-bold text-green-600">{points}</p>
-            <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold">Points</p>
+            <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold">{t.common.points}</p>
           </div>
           <div className="bg-white p-5 rounded-2xl shadow-lg border border-gray-100 text-center">
             <p className="text-3xl font-bold text-blue-600">{carbonOffset}kg</p>
-            <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold">CO2 Saved</p>
+            <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold">{language === 'en' ? 'CO2 Saved' : 'CO2 Dijimat'}</p>
+          </div>
+        </motion.div>
+
+        {/* Language Switcher */}
+        <motion.div 
+          initial={{ y: 20, opacity: 0 }} 
+          animate={{ y: 0, opacity: 1 }} 
+          transition={{ delay: 0.45 }}
+          className="bg-white rounded-2xl shadow-lg border border-gray-100 p-4 flex items-center justify-between"
+        >
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-gray-100 rounded-xl">
+              <Languages size={20} className="text-green-600" />
+            </div>
+            <span className="font-medium text-gray-800">{t.profile.language}</span>
+          </div>
+          <div className="flex bg-gray-100 p-1 rounded-xl">
+            <button 
+              onClick={() => setLanguage('en')}
+              className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${language === 'en' ? 'bg-white text-green-600 shadow-sm' : 'text-gray-500'}`}
+            >
+              English
+            </button>
+            <button 
+              onClick={() => setLanguage('ms')}
+              className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${language === 'ms' ? 'bg-white text-green-600 shadow-sm' : 'text-gray-500'}`}
+            >
+              B. Melayu
+            </button>
           </div>
         </motion.div>
 
@@ -115,7 +147,7 @@ export default function UserProfile({ onBack, points, carbonOffset }: UserProfil
           transition={{ delay: 0.6 }}
           className="bg-white rounded-2xl p-5 shadow-lg border border-gray-100 space-y-4"
         >
-          <h3 className="font-bold text-gray-800 mb-2">Contact Information</h3>
+          <h3 className="font-bold text-gray-800 mb-2">{language === 'en' ? 'Contact Information' : 'Maklumat Hubungan'}</h3>
           <div className="flex items-center gap-3 text-sm text-gray-700">
             <Mail size={18} className="text-gray-400" />
             <span>alex.green@example.com</span>
@@ -138,8 +170,10 @@ export default function UserProfile({ onBack, points, carbonOffset }: UserProfil
           className="bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden"
         >
           <div className="relative z-10">
-            <h3 className="font-bold text-lg mb-1 text-yellow-900">Elite Eco-Member</h3>
-            <p className="text-yellow-800 text-sm opacity-90">You are in the top 5% of recyclers in your area!</p>
+            <h3 className="font-bold text-lg mb-1 text-yellow-900">{language === 'en' ? 'Elite Eco-Member' : 'Ahli Elit Eco'}</h3>
+            <p className="text-yellow-800 text-sm opacity-90">
+              {language === 'en' ? 'You are in the top 5% of recyclers in your area!' : 'Anda berada dalam 5% teratas pengitar semula di kawasan anda!'}
+            </p>
           </div>
           <Award className="absolute -right-4 -bottom-4 w-24 h-24 text-white/20 rotate-12" />
         </motion.div>

@@ -4,6 +4,7 @@ import { useState, useRef } from 'react';
 import { Camera, Upload, X, CheckCircle2, AlertTriangle, Loader2, ArrowLeft } from 'lucide-react';
 import { GoogleGenAI, Type } from '@google/genai';
 import { motion, AnimatePresence } from 'motion/react';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface SmartScanProps {
   onComplete: (points: number) => void;
@@ -25,6 +26,7 @@ interface ScanError {
 }
 
 export default function SmartScan({ onComplete, onBack }: SmartScanProps) {
+  const { t, language } = useLanguage();
   const [image, setImage] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [result, setResult] = useState<ScanResult | null>(null);
@@ -73,7 +75,7 @@ export default function SmartScan({ onComplete, onBack }: SmartScanProps) {
                 Analyze this image and provide:
                 1. grade: "A" (Premium UCO: Light color, clear, minimal food particles/water), "B" (Standard UCO: Brownish, some food particles, typical household use), or "C" (Low-grade UCO: Dark brown/black, thick, high debris, high water content).
                 2. debrisDetected: true or false (if there are significant food particles).
-                3. reasoning: A short 1-sentence explanation of why you gave this grade.
+                3. reasoning: A short 1-sentence explanation of why you gave this grade. Provide the reasoning in ${language === 'ms' ? 'Bahasa Melayu' : 'English'}.
                 4. purityPercentage: A number from 0 to 100 representing the estimated purity of the oil.
                 5. waterContent: "Low", "Medium", or "High" representing the estimated water content.
                 6. oilType: "Vegetable", "Animal Fat", "Mixed", or "Unknown" based on the visual characteristics of the oil.`
@@ -110,10 +112,11 @@ export default function SmartScan({ onComplete, onBack }: SmartScanProps) {
         // Check if AI actually found oil
         if (parsedResult.reasoning.toLowerCase().includes("no oil") || 
             parsedResult.reasoning.toLowerCase().includes("cannot see") ||
+            parsedResult.reasoning.toLowerCase().includes("tiada minyak") ||
             parsedResult.reasoning.toLowerCase().includes("blurry")) {
           setError({
-            message: "Analysis Unclear",
-            suggestion: "The AI couldn't clearly identify the oil. Please ensure the photo is well-lit and the oil is clearly visible in a transparent container."
+            message: t.scan.unclearTitle,
+            suggestion: t.scan.unclearDesc
           });
           return;
         }
@@ -124,17 +127,10 @@ export default function SmartScan({ onComplete, onBack }: SmartScanProps) {
       }
     } catch (err: any) {
       console.error(err);
-      if (err.message?.includes("fetch")) {
-        setError({
-          message: "Connection Error",
-          suggestion: "Please check your internet connection and try again."
-        });
-      } else {
-        setError({
-          message: "Analysis Failed",
-          suggestion: "Something went wrong during the AI analysis. Please try taking a clearer photo."
-        });
-      }
+      setError({
+        message: t.scan.failTitle,
+        suggestion: t.scan.failDesc
+      });
     } finally {
       setIsAnalyzing(false);
     }
@@ -161,7 +157,7 @@ export default function SmartScan({ onComplete, onBack }: SmartScanProps) {
         <button onClick={onBack} className="p-2 bg-white/20 rounded-full backdrop-blur-md">
           <ArrowLeft size={24} />
         </button>
-        <div className="font-semibold tracking-wide">AI SMART SCAN</div>
+        <div className="font-semibold tracking-wide uppercase">{t.scan.title}</div>
         <div className="w-10"></div> {/* Spacer */}
       </div>
 
@@ -171,8 +167,8 @@ export default function SmartScan({ onComplete, onBack }: SmartScanProps) {
           <div className="w-full max-w-sm flex flex-col items-center gap-8">
             <div className="w-64 h-64 border-2 border-dashed border-green-500/50 rounded-3xl flex flex-col items-center justify-center bg-green-500/10 text-green-400 p-6 text-center">
               <Camera size={48} className="mb-4 opacity-80" />
-              <p className="font-medium">Position your oil container in frame</p>
-              <p className="text-xs opacity-70 mt-2">Ensure good lighting for accurate grading</p>
+              <p className="font-medium">{t.scan.instructions}</p>
+              <p className="text-xs opacity-70 mt-2">{t.scan.scanTip}</p>
             </div>
             
             <input 
@@ -191,7 +187,7 @@ export default function SmartScan({ onComplete, onBack }: SmartScanProps) {
               className="w-full bg-green-500 text-black font-bold text-lg py-4 rounded-full flex items-center justify-center gap-2 hover:bg-green-400 transition-all shadow-lg active:shadow-inner"
             >
               <Upload size={24} />
-              Take Photo or Upload
+              {t.scan.startScan}
             </motion.button>
           </div>
         ) : (
@@ -236,7 +232,7 @@ export default function SmartScan({ onComplete, onBack }: SmartScanProps) {
                     </div>
                     
                     <h3 className="text-xl font-bold text-white mb-2 tracking-tight">EcoDrop Vision AI</h3>
-                    <p className="text-green-400 text-sm font-medium animate-pulse mb-6">Analyzing Oil Purity...</p>
+                    <p className="text-green-400 text-sm font-medium animate-pulse mb-6">{t.scan.analyzing}</p>
                     
                     {/* Simulated Progress Bar */}
                     <div className="w-48 h-1.5 bg-white/10 rounded-full overflow-hidden">
@@ -251,14 +247,13 @@ export default function SmartScan({ onComplete, onBack }: SmartScanProps) {
                     <div className="mt-8">
                       <button 
                         onClick={() => {
-                          // A more robust solution would cancel the API request
                           setIsAnalyzing(false);
                           setImage(null);
                           setError(null);
                         }}
                         className="text-white/50 text-xs font-semibold uppercase tracking-widest hover:text-white transition-colors"
                       >
-                        Cancel
+                        {t.common.cancel}
                       </button>
                     </div>
                   </div>
@@ -277,7 +272,7 @@ export default function SmartScan({ onComplete, onBack }: SmartScanProps) {
                   
                   <div className="flex justify-between items-start mb-8">
                     <div>
-                      <h3 className="text-2xl font-black tracking-tight">Analysis Report</h3>
+                      <h3 className="text-2xl font-black tracking-tight">{t.scan.result}</h3>
                       <p className="text-sm text-gray-500 font-medium">EcoDrop Vision Engine v2.5</p>
                     </div>
                     <div className="flex flex-col items-end">
@@ -288,7 +283,7 @@ export default function SmartScan({ onComplete, onBack }: SmartScanProps) {
                       }`}>
                         {result.grade}
                       </div>
-                      <span className="text-[10px] font-bold text-gray-400 mt-2 uppercase tracking-widest">Quality Grade</span>
+                      <span className="text-[10px] font-bold text-gray-400 mt-2 uppercase tracking-widest">{t.scan.qualityGrade}</span>
                     </div>
                   </div>
 
@@ -308,7 +303,7 @@ export default function SmartScan({ onComplete, onBack }: SmartScanProps) {
                       </div>
                       <div>
                         <h4 className="font-bold text-gray-900">
-                          {result.grade === 'A' ? 'Premium Grade' : result.grade === 'B' ? 'Standard Grade' : 'Industrial Grade'}
+                          {result.grade === 'A' ? t.scan.premiumGrade : result.grade === 'B' ? t.scan.standardGrade : t.scan.industrialGrade}
                         </h4>
                         <p className="text-sm text-gray-600 leading-snug mt-1">
                           {result.reasoning}
@@ -318,7 +313,7 @@ export default function SmartScan({ onComplete, onBack }: SmartScanProps) {
 
                     {/* Purity Bento Item */}
                     <div className="bg-gray-50 p-5 rounded-3xl border border-gray-100 flex flex-col justify-between">
-                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4">Purity Level</span>
+                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4">{t.scan.purityLevel}</span>
                       <div className="flex items-end justify-between">
                         <span className="text-3xl font-black text-gray-900">{result.purityPercentage}%</span>
                         <div className="w-10 h-10 rounded-full border-2 border-gray-200 flex items-center justify-center">
@@ -332,31 +327,30 @@ export default function SmartScan({ onComplete, onBack }: SmartScanProps) {
 
                     {/* Water Content Bento Item */}
                     <div className="bg-gray-50 p-5 rounded-3xl border border-gray-100 flex flex-col justify-between">
-                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4">Water Content</span>
+                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4">{t.scan.waterContent}</span>
                       <div className="flex items-center gap-3">
                         <div className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${
                           result.waterContent === 'Low' ? 'bg-green-100 text-green-700' :
                           result.waterContent === 'Medium' ? 'bg-yellow-100 text-yellow-700' :
                           'bg-red-100 text-red-700'
                         }`}>
-                          {result.waterContent}
+                          {result.waterContent === 'Low' ? t.scan.low : result.waterContent === 'Medium' ? t.scan.medium : t.scan.high}
                         </div>
-                        <span className="text-[10px] text-gray-400 font-medium">Detected</span>
                       </div>
                     </div>
 
                     {/* Oil Type Bento Item */}
                     <div className="bg-gray-900 p-5 rounded-3xl text-white flex flex-col justify-between">
-                      <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-4">Source Type</span>
+                      <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-4">{t.scan.sourceType}</span>
                       <span className="text-lg font-bold">{result.oilType}</span>
                     </div>
 
                     {/* Impact Bento Item */}
                     <div className="bg-green-600 p-5 rounded-3xl text-white flex flex-col justify-between">
-                      <span className="text-[10px] font-bold text-green-200 uppercase tracking-widest mb-4">Eco Impact</span>
+                      <span className="text-[10px] font-bold text-green-200 uppercase tracking-widest mb-4">{t.scan.ecoImpact}</span>
                       <div>
                         <span className="text-xl font-black">~{result.grade === 'A' ? '2.4' : result.grade === 'B' ? '1.8' : '0.9'}kg</span>
-                        <p className="text-[10px] text-green-100 font-medium">CO2 Offset Potential</p>
+                        <p className="text-[10px] text-green-100 font-medium">{t.scan.co2Offset}</p>
                       </div>
                     </div>
                   </div>
@@ -367,8 +361,8 @@ export default function SmartScan({ onComplete, onBack }: SmartScanProps) {
                       <div className="flex items-start gap-3 bg-orange-50 border border-orange-100 p-4 rounded-2xl">
                         <AlertTriangle size={20} className="text-orange-500 mt-0.5 shrink-0" />
                         <div>
-                          <h5 className="font-bold text-orange-900 text-sm">Action Required: Filtering</h5>
-                          <p className="text-xs text-orange-700 mt-1 leading-relaxed">Significant food particles detected. Please use a fine mesh strainer before your next drop-off to maintain Grade A quality.</p>
+                          <h5 className="font-bold text-orange-900 text-sm">{t.scan.actionRequired}</h5>
+                          <p className="text-xs text-orange-700 mt-1 leading-relaxed">{t.scan.filteringDesc}</p>
                         </div>
                       </div>
                     )}
@@ -376,11 +370,11 @@ export default function SmartScan({ onComplete, onBack }: SmartScanProps) {
                     <div className="bg-blue-50 border border-blue-100 p-4 rounded-2xl flex items-start gap-3">
                       <CheckCircle2 size={20} className="text-blue-500 mt-0.5 shrink-0" />
                       <div>
-                        <h5 className="font-bold text-blue-900 text-sm">Recycling Potential</h5>
+                        <h5 className="font-bold text-blue-900 text-sm">{t.scan.recyclingPotential}</h5>
                         <p className="text-xs text-blue-700 mt-1 leading-relaxed">
-                          {result.grade === 'A' ? 'Highly suitable for premium biodiesel production.' : 
-                           result.grade === 'B' ? 'Perfect for industrial-grade soap and detergent base.' : 
-                           'Suitable for technical lubricants and heavy-duty industrial use.'}
+                          {result.grade === 'A' ? t.scan.premiumDesc : 
+                           result.grade === 'B' ? t.scan.standardDesc : 
+                           t.scan.industrialDesc}
                         </p>
                       </div>
                     </div>
@@ -393,7 +387,7 @@ export default function SmartScan({ onComplete, onBack }: SmartScanProps) {
                       whileTap={{ scale: 0.95 }}
                       className="flex-1 bg-gray-100 text-gray-900 font-bold py-4 rounded-2xl hover:bg-gray-200 transition-colors"
                     >
-                      Scan New
+                      {t.scan.scanNew}
                     </motion.button>
                     <motion.button 
                       onClick={handleClaimPoints}
@@ -402,10 +396,10 @@ export default function SmartScan({ onComplete, onBack }: SmartScanProps) {
                       className="flex-[2] bg-green-600 text-white font-bold py-4 rounded-2xl hover:bg-green-700 transition-colors flex flex-col items-center justify-center shadow-xl shadow-green-100"
                     >
                       <div className="flex items-center gap-2">
-                        <span>Claim {result.grade === 'A' ? 50 : result.grade === 'B' ? 30 : 10} Points</span>
+                        <span>{t.scan.claim} {result.grade === 'A' ? 50 : result.grade === 'B' ? 30 : 10} {t.common.points}</span>
                         <ArrowLeft size={18} className="rotate-180" />
                       </div>
-                      <span className="text-[10px] font-bold text-green-200 uppercase tracking-widest mt-0.5">Verified Quality</span>
+                      <span className="text-[10px] font-bold text-green-200 uppercase tracking-widest mt-0.5">{t.scan.verifiedQuality}</span>
                     </motion.button>
                   </div>
                 </motion.div>
@@ -442,14 +436,13 @@ export default function SmartScan({ onComplete, onBack }: SmartScanProps) {
                     onClick={() => {
                       setError(null);
                       if (image && fileInputRef.current) {
-                        // Re-analyze existing image
                         const mimeType = image.split(';')[0].split(':')[1];
                         analyzeImage(image, mimeType);
                       }
                     }}
                     className="w-full bg-gray-900 text-white font-bold py-4 rounded-xl hover:bg-gray-800 transition-colors"
                   >
-                    Retry Analysis
+                    {t.scan.retryAnalysis}
                   </button>
                   <button 
                     onClick={() => {
@@ -458,7 +451,7 @@ export default function SmartScan({ onComplete, onBack }: SmartScanProps) {
                     }}
                     className="w-full bg-gray-100 text-gray-600 font-semibold py-3 rounded-xl hover:bg-gray-200 transition-colors"
                   >
-                    Take New Photo
+                    {t.scan.takeNewPhoto}
                   </button>
                 </div>
               </motion.div>

@@ -2,32 +2,35 @@
 
 import { motion } from 'motion/react';
 import { BookOpen, Recycle, Leaf, Trash2, CheckCircle2, ArrowRight, Info } from 'lucide-react';
+import { useLanguage } from '@/hooks/useLanguage';
 
 export default function EducationSection() {
+  const { t } = useLanguage();
+  
   const sections = [
     {
-      title: "The Silent Pollutant",
-      subtitle: "Why UCO matters",
+      title: t.education.sections[0].title,
+      subtitle: t.education.sections[0].subtitle,
       icon: Recycle,
       color: "text-red-500",
       bg: "bg-red-50",
-      content: "One liter of used cooking oil can contaminate up to one million liters of clean water. When poured down drains, it solidifies and causes 'fatbergs', leading to massive sewage backups and expensive repairs."
+      content: t.education.sections[0].content
     },
     {
-      title: "From Waste to Energy",
-      subtitle: "The Circular Economy",
+      title: t.education.sections[1].title,
+      subtitle: t.education.sections[1].subtitle,
       icon: Leaf,
       color: "text-green-500",
       bg: "bg-green-50",
-      content: "Properly recycled UCO is a primary feedstock for Biodiesel. It burns 75% cleaner than petroleum diesel and reduces greenhouse gas emissions significantly. Your waste literally powers the future."
+      content: t.education.sections[1].content
     },
     {
-      title: "Proper Disposal",
-      subtitle: "Step-by-step guide",
+      title: t.education.sections[2].title,
+      subtitle: t.education.sections[2].subtitle,
       icon: Trash2,
       color: "text-blue-500",
       bg: "bg-blue-50",
-      content: "1. Cool the oil completely. 2. Filter out food particles. 3. Pour into a clean, leak-proof container. 4. Use EcoDrop to find the nearest collection point."
+      content: t.education.sections[2].content
     }
   ];
 
@@ -43,12 +46,12 @@ export default function EducationSection() {
           animate={{ opacity: 1, y: 0 }}
           className="relative z-10"
         >
-          <span className="text-green-400 font-bold text-xs uppercase tracking-widest mb-2 block">Eco-Education</span>
-          <h1 className="text-4xl font-black tracking-tighter leading-none mb-4">
-            Small Drops,<br />Big Impact.
+          <span className="text-green-400 font-bold text-xs uppercase tracking-widest mb-2 block">{t.education.badge}</span>
+          <h1 className="text-4xl font-black tracking-tighter leading-none mb-4 whitespace-pre-line">
+            {t.education.title}
           </h1>
           <p className="text-gray-400 text-sm leading-relaxed max-w-[280px]">
-            Learn how your recycling efforts are transforming the environmental landscape of Malaysia.
+            {t.education.subtitle}
           </p>
         </motion.div>
       </div>
@@ -82,21 +85,15 @@ export default function EducationSection() {
         <div className="bg-green-600 rounded-3xl p-8 text-white">
           <div className="flex items-center gap-2 mb-6">
             <Info size={20} className="text-green-200" />
-            <h3 className="font-bold uppercase tracking-widest text-xs text-green-200">Did you know?</h3>
+            <h3 className="font-bold uppercase tracking-widest text-xs text-green-200">{t.education.didYouKnow}</h3>
           </div>
           <div className="space-y-6">
-            <div className="flex gap-4">
-              <span className="text-3xl font-black text-green-300 opacity-50">01</span>
-              <p className="text-sm font-medium leading-snug">Biodiesel from UCO reduces CO2 emissions by up to 88% compared to fossil fuels.</p>
-            </div>
-            <div className="flex gap-4">
-              <span className="text-3xl font-black text-green-300 opacity-50">02</span>
-              <p className="text-sm font-medium leading-snug">Recycled oil can be used to make eco-friendly soaps, candles, and industrial lubricants.</p>
-            </div>
-            <div className="flex gap-4">
-              <span className="text-3xl font-black text-green-300 opacity-50">03</span>
-              <p className="text-sm font-medium leading-snug">Malaysia generates over 500,000 tonnes of UCO annually, but only a fraction is recycled properly.</p>
-            </div>
+            {t.education.facts.map((fact, idx) => (
+              <div key={idx} className="flex gap-4">
+                <span className="text-3xl font-black text-green-300 opacity-50">0{idx + 1}</span>
+                <p className="text-sm font-medium leading-snug">{fact}</p>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -106,7 +103,7 @@ export default function EducationSection() {
             <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm">
               <CheckCircle2 size={20} className="text-green-500" />
             </div>
-            <p className="text-xs font-bold text-gray-900">Start your first scan today</p>
+            <p className="text-xs font-bold text-gray-900">{t.education.cta}</p>
           </div>
           <ArrowRight size={20} className="text-gray-400" />
         </div>

@@ -1,6 +1,7 @@
 import { ViewState } from '@/app/page';
 import { Home, ScanLine, Map, Gift, Building2 } from 'lucide-react';
 import { motion } from 'motion/react';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface BottomNavProps {
   currentView: ViewState;
@@ -8,12 +9,14 @@ interface BottomNavProps {
 }
 
 export default function BottomNav({ currentView, onViewChange }: BottomNavProps) {
+  const { t } = useLanguage();
+
   const navItems = [
-    { id: 'dashboard', icon: Home, label: 'Home' },
-    { id: 'locator', icon: Map, label: 'Map' },
-    { id: 'scan', icon: ScanLine, label: 'Scan' },
-    { id: 'rewards', icon: Gift, label: 'Rewards' },
-    { id: 'b2b', icon: Building2, label: 'B2B' },
+    { id: 'dashboard', icon: Home, label: t.nav.home },
+    { id: 'locator', icon: Map, label: t.nav.map },
+    { id: 'scan', icon: ScanLine, label: t.nav.scan },
+    { id: 'rewards', icon: Gift, label: t.nav.rewards },
+    { id: 'b2b', icon: Building2, label: t.nav.b2b },
   ] as const;
 
   return (
