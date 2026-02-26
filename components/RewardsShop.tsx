@@ -1,8 +1,8 @@
 'use client';
 
+import { useState } from 'react';
 import { motion } from 'motion/react';
 import { Ticket, Fuel, ShoppingBag, ArrowRight } from 'lucide-react';
-import Image from 'next/image';
 
 interface RewardsShopProps {
   points: number;
@@ -10,13 +10,15 @@ interface RewardsShopProps {
 }
 
 export default function RewardsShop({ points, onBack }: RewardsShopProps) {
+  const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({});
+
   const vouchers = [
     {
       partner: 'Petronas',
       title: 'RM5 Fuel Voucher',
       points: 500,
       icon: Fuel,
-      logo: '/petronas-logo.png',
+      logo: 'https://logo.clearbit.com/petronas.com',
       bg: 'bg-teal-500',
     },
     {
@@ -24,7 +26,7 @@ export default function RewardsShop({ points, onBack }: RewardsShopProps) {
       title: 'RM5 Fuel Voucher',
       points: 500,
       icon: Fuel,
-      logo: '/shell-logo.png',
+      logo: 'https://logo.clearbit.com/shell.com',
       bg: 'bg-yellow-400',
     },
     {
@@ -32,7 +34,7 @@ export default function RewardsShop({ points, onBack }: RewardsShopProps) {
       title: 'RM10 Grocery Voucher',
       points: 1000,
       icon: ShoppingBag,
-      logo: '/tesco-logo.png',
+      logo: 'https://logo.clearbit.com/tesco.com',
       bg: 'bg-blue-600',
     },
     {
@@ -40,7 +42,7 @@ export default function RewardsShop({ points, onBack }: RewardsShopProps) {
       title: 'RM10 Shopping Voucher',
       points: 1000,
       icon: ShoppingBag,
-      logo: '/aeon-logo.png',
+      logo: 'https://logo.clearbit.com/aeon.info',
       bg: 'bg-pink-500',
     },
   ];
@@ -65,6 +67,8 @@ export default function RewardsShop({ points, onBack }: RewardsShopProps) {
       <div className="flex-1 overflow-y-auto p-6 space-y-4">
         {vouchers.map((voucher, index) => {
           const canRedeem = points >= voucher.points;
+          const hasError = imageErrors[index];
+
           return (
             <motion.div
               key={index}
@@ -76,10 +80,18 @@ export default function RewardsShop({ points, onBack }: RewardsShopProps) {
               <div className="absolute -right-8 -bottom-8 w-32 h-32 opacity-10">
                 <voucher.icon className="w-full h-full" />
               </div>
-              <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shrink-0 p-2 shadow-md">
-                <div className="w-full h-full relative">
-                  <Image src={voucher.logo} alt={`${voucher.partner} logo`} fill style={{ objectFit: 'contain' }} />
-                </div>
+              <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shrink-0 p-2 shadow-md overflow-hidden">
+                {!hasError ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img 
+                    src={voucher.logo} 
+                    alt={`${voucher.partner} logo`} 
+                    className="w-full h-full object-contain"
+                    onError={() => setImageErrors(prev => ({ ...prev, [index]: true }))}
+                  />
+                ) : (
+                  <voucher.icon className="w-8 h-8 text-gray-400" />
+                )}
               </div>
               <div className="flex-1 relative">
                 <p className="text-xs font-bold opacity-80 uppercase tracking-wider">{voucher.partner}</p>

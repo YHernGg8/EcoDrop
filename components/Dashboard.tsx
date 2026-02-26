@@ -49,24 +49,25 @@ export default function Dashboard({ verifiedPoints, pendingPoints, carbonOffset,
           animate={{ opacity: 1, y: 0 }}
           className="bg-gradient-to-br from-green-500 to-green-600 rounded-3xl p-5 text-white shadow-lg shadow-green-200 relative overflow-hidden"
         >
-          <div className="flex items-center gap-2 mb-2 opacity-90">
-            <Leaf size={18} />
-            <span className="text-xs font-medium uppercase tracking-wider">Verified Points</span>
+          <div className="flex justify-between items-start mb-2">
+            <div className="flex items-center gap-2 opacity-90">
+              <Leaf size={18} />
+              <span className="text-xs font-medium uppercase tracking-wider">Verified Points</span>
+            </div>
+            {pendingPoints > 0 && (
+              <motion.div 
+                initial={{ x: 20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                className="bg-yellow-400 text-gray-900 text-[9px] font-black px-2 py-0.5 rounded-full shadow-sm flex items-center gap-1 shrink-0"
+              >
+                <div className="w-1 h-1 bg-gray-900 rounded-full animate-pulse" />
+                {pendingPoints} PENDING
+              </motion.div>
+            )}
           </div>
           <div className="text-3xl font-bold">
             <Counter value={verifiedPoints} />
           </div>
-          
-          {pendingPoints > 0 && (
-            <motion.div 
-              initial={{ x: 50, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              className="absolute top-4 right-4 bg-yellow-400 text-gray-900 text-[10px] font-black px-2 py-1 rounded-full shadow-sm flex items-center gap-1"
-            >
-              <div className="w-1.5 h-1.5 bg-gray-900 rounded-full animate-pulse" />
-              {pendingPoints} PENDING
-            </motion.div>
-          )}
         </motion.div>
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
